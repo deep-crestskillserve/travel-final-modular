@@ -133,6 +133,3 @@ class TravelAgent:
     def _has_available_flights(self, flight_data: Dict) -> bool:
         """Check if flight data contains available flights"""
         return bool(flight_data.get("flights"))
-    
-    async def reset(self):
-        return "", [], self.make_thread_id(), {}

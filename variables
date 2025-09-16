@@ -38,6 +38,6 @@ booking_buttons
 booking_results
 group *
 
+message
 chatbot
-messages
-thread
+thread_id_state

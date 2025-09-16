@@ -1,10 +1,9 @@
-import gradio as gr
-from typing import List, Dict
 from utils.helpers import format_duration, build_details, ordinal
-import json
-# import httpx
-import requests
 from utils.logger import logger
+from typing import List, Dict
+import gradio as gr
+import requests
+
 logger = logger()
 
 MAX_FLIGHTS = 20
@@ -27,7 +26,7 @@ class UIManager:
         logos = "".join(
             f'<img src="{f.get("airline_logo", "")}"'
             f'title="{f.get("airline", "")}"'
-            f' onerror="this.src={PLACEHOLDER_IMAGE_URL}">'
+            f' onerror="this.src=\'{PLACEHOLDER_IMAGE_URL}\'">'
             for f in flight.get("flights", [])
         )
         selected_class = "selected" if selected else ""
@@ -65,9 +64,9 @@ class UIManager:
             return gr.update(visible=False), *[""]*MAX_FLIGHTS, *[gr.update(visible=False)]*MAX_FLIGHTS
         
         if flights[0].get("departure_token"):
-            logger.info("displaying outbound flights")
-        else:
             logger.info("displaying return flights")
+        else:
+            logger.info("displaying outbound flights")
 
         visible = bool(flights)
         html_updates = []
@@ -112,11 +111,14 @@ class UIManager:
         flights = flight_data.get("flights", []) if flight_data else []
 
         if not flight_data or not flight_data.get("flights"):
-            return VIEW_OUTBOUND_CARDS, "No flight data available"  # Fallback to cards view on error
+            return VIEW_OUTBOUND_CARDS, "No flight data available"
         
+        if selected < 0 or selected >= len(flights):
+            return VIEW_OUTBOUND_CARDS, {"error": "Invalid flight selection"}
+
         next_view = ""
         if params.get("return_date"):
-            # Round-trip: Distinguish based on departure_token
+            # Round-trip: Check if these are return flights (no departure_token) or outbound flights (have departure_token)
             if flights[0].get("departure_token"):
                 next_view = VIEW_OUTBOUND_DETAILS
             else:
@@ -132,15 +134,16 @@ class UIManager:
                 return VIEW_RETURN_CARDS, "Invalid flight selection"
         logger.info(f"Showing flight details for {ordinal(selected + 1)} flight")
 
-        details = build_details(selected, flight_data)
+        details = build_details(selected, flights)
         return next_view, details
 
     @staticmethod
-    async def on_get_return_flights(selected: int, flight_data: Dict, initial_payload: Dict):
+    def on_get_return_flights(selected: int, flight_data: Dict, initial_payload: Dict):
         
         flights = flight_data.get("flights", []) if flight_data else []
         
         if selected < 0 or selected >= len(flights):
+            logger.error("Invalid flight selection for return flights")
             return VIEW_RETURN_CARDS, {"error": "Invalid flight selection"}
         
         departure_token = flights[selected].get("departure_token", "")
@@ -157,18 +160,17 @@ class UIManager:
         }
 
         try:
-            # Use synchronous requests instead of async httpx
             response = requests.get(f"{BASE_URL}/return-flights", params=departure_input, timeout=90)
             response.raise_for_status()
-            flight_data = response.json()
+            return_flight_data = response.json()
             logger.info("Return flights loaded")
-            return VIEW_RETURN_CARDS, flight_data
+            return VIEW_RETURN_CARDS, return_flight_data
         except requests.RequestException as e:
             logger.error(f"Error fetching return flights: {e}")
             return VIEW_RETURN_CARDS, {"error": f"Failed to fetch return flights: {str(e)}"}
 
     @staticmethod
-    async def on_booking_options(selected: int, flight_data: Dict, initial_payload: Dict):
+    def on_booking_options(selected: int, flight_data: Dict, initial_payload: Dict):
         
         flights = flight_data.get("flights", []) if flight_data else []
         
@@ -178,7 +180,7 @@ class UIManager:
         else:
             error_view = VIEW_OUTBOUND_DETAILS
         if selected < 0 or selected >= len(flights):
-            return error_view, {"error": "Invalid flight selection"}
+            return error_view, {"error": "Invalid flight selection for booking option"}
 
         booking_token = flights[selected].get("booking_token", "")
         if not booking_token:
@@ -192,9 +194,8 @@ class UIManager:
             **initial_payload,
             "booking_token": booking_token,
         }
-        booking_data = {}
+
         try:
-            # Use synchronous requests instead of async httpx
             response = requests.get(f"{BASE_URL}/bookingdata", params=booking_input, timeout=90)
             response.raise_for_status()
             booking_data = response.json()
@@ -206,13 +207,44 @@ class UIManager:
 
     @staticmethod
     def update_view(view: str):
+        """Update visibility of different view sections"""
         if view == VIEW_OUTBOUND_CARDS:
-            return gr.update(visible=True), gr.update(visible=False), gr.update(visible=False), gr.update(visible=False), gr.update(visible=False)
+            return (
+                gr.update(visible=True),   # outbound_flight_cards
+                gr.update(visible=False),  # return_flight_cards
+                gr.update(visible=False),  # outbound_flight_details
+                gr.update(visible=False),  # return_flight_details
+                gr.update(visible=False)   # flight_booking_section
+            )
         elif view == VIEW_RETURN_CARDS:
-            return gr.update(visible=False), gr.update(visible=True), gr.update(visible=False), gr.update(visible=False), gr.update(visible=False)
+            return (
+                gr.update(visible=False),  # outbound_flight_cards
+                gr.update(visible=True),   # return_flight_cards
+                gr.update(visible=False),  # outbound_flight_details
+                gr.update(visible=False),  # return_flight_details
+                gr.update(visible=False)   # flight_booking_section
+            )
         elif view == VIEW_OUTBOUND_DETAILS:
-            return gr.update(visible=False), gr.update(visible=False), gr.update(visible=True), gr.update(visible=False), gr.update(visible=False)
+            return (
+                gr.update(visible=False),  # outbound_flight_cards
+                gr.update(visible=False),  # return_flight_cards
+                gr.update(visible=True),   # outbound_flight_details
+                gr.update(visible=False),  # return_flight_details
+                gr.update(visible=False)   # flight_booking_section
+            )
         elif view == VIEW_RETURN_DETAILS:
-            return gr.update(visible=False), gr.update(visible=False), gr.update(visible=False), gr.update(visible=True), gr.update(visible=False)
+            return (
+                gr.update(visible=False),  # outbound_flight_cards
+                gr.update(visible=False),  # return_flight_cards
+                gr.update(visible=False),  # outbound_flight_details
+                gr.update(visible=True),   # return_flight_details
+                gr.update(visible=False)   # flight_booking_section
+            )
         elif view == VIEW_BOOKING:
-            return gr.update(visible=False), gr.update(visible=False), gr.update(visible=False), gr.update(visible=False), gr.update(visible=True)
+            return (
+                gr.update(visible=False),  # outbound_flight_cards
+                gr.update(visible=False),  # return_flight_cards
+                gr.update(visible=False),  # outbound_flight_details
+                gr.update(visible=False),  # return_flight_details
+                gr.update(visible=True)    # flight_booking_section
+            )

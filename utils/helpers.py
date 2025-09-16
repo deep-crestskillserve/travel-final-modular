@@ -41,11 +41,10 @@ def book_flight(post_data: str) -> str:
     except Exception as e:
         return f"Error during booking: {str(e)}"
 
-def build_details(index: Optional[int], flights: Dict) -> str:
+def build_details(index: Optional[int], flights: List[Dict]) -> str:
     if index is None or index < 0 or index >= len(flights):
         return "Select a flight below to see full details"
     logger.info(f"Building details for {ordinal(index + 1)} flight")
-    flights = flights.get("flights")
     flight = flights[index]
     details = f"## ✈️ Flight Option {index+1}\n"
     details += f"**Total Duration:** {format_duration(flight.get('total_duration'))}\n"

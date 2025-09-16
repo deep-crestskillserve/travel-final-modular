@@ -2,7 +2,8 @@
 import gradio as gr
 from frontend.components.ui_manager import UIManager
 from backend.agents.travel_agent import TravelAgent
-from utils.helpers import build_details, book_flight
+from utils.helpers import book_flight
+
 MAX_FLIGHTS = 20
 MAX_BOOKING_OPTIONS = 10
 VIEW_OUTBOUND_CARDS = "outbound cards"
@@ -114,7 +115,65 @@ def create_travel_app():
         else:  # One-way
             # Show "Finalise Flight" button, hide "Get Return Flights" button
             return gr.update(visible=True), gr.update(visible=False)
+    
+    def complete_reset():
+        """Complete reset of all states and UI components"""
+        # Reset all state variables
+        new_thread_id = travel_agent.make_thread_id()
         
+        # Create empty card updates
+        empty_card_html = [""] * MAX_FLIGHTS
+        hidden_card_containers = [gr.update(visible=False)] * MAX_FLIGHTS
+        
+        # Create empty booking updates
+        hidden_booking_groups = [gr.update(visible=False)] * MAX_BOOKING_OPTIONS
+        empty_info_updates = [""] * MAX_BOOKING_OPTIONS
+        hidden_booking_buttons = [gr.update(visible=False)] * MAX_BOOKING_OPTIONS
+        empty_booking_results = [""] * MAX_BOOKING_OPTIONS
+        
+        return (
+            # Basic inputs/outputs
+            "",  # message
+            [],  # chatbot
+            new_thread_id,  # thread_id_state
+            
+            # State variables
+            VIEW_OUTBOUND_CARDS,  # current_view
+            {},  # initial_flight_payload
+            {},  # outbound_flights_state
+            None,  # selected_outbound_index
+            {},  # return_flights_state
+            None,  # selected_return_index
+            {},  # booking_data_state
+            
+            # UI visibility
+            gr.update(visible=False),  # flight_section
+            
+            # Outbound flight cards
+            *empty_card_html,  # outbound_card_html_components
+            *hidden_card_containers,  # outbound_card_containers
+            gr.update(interactive=False),  # outbound_view_flight_button
+            
+            # Outbound flight details
+            "Select a flight to see details",  # outbound_flight_details_box
+            gr.update(visible=False),  # outbound_booking_options_button
+            gr.update(visible=False),  # get_return_flights_button
+            
+            # Return flight cards
+            *empty_card_html,  # return_card_html_components
+            *hidden_card_containers,  # return_card_containers
+            gr.update(interactive=False),  # return_view_flight_button
+            
+            # Return flight details
+            "Select a return flight to see details",  # return_flight_details_box
+            
+            # Booking section
+            *hidden_booking_groups,  # booking_groups visibility
+            *empty_info_updates,  # info_mds content
+            *hidden_booking_buttons,  # booking_buttons visibility
+            *empty_booking_results,  # booking_results content
+        )
+
     with gr.Blocks(theme=gr.themes.Default(primary_hue="emerald"), css=CSS) as demo:
         gr.Markdown("Enter your travel query")
         
@@ -133,7 +192,6 @@ def create_travel_app():
             
             with gr.Column(visible=False) as flight_section:
                 gr.Markdown("# 🛫 Available Flights")
-                
                 
                 with gr.Column(visible=True) as outbound_flight_cards:
                     with gr.Row():
@@ -160,10 +218,9 @@ def create_travel_app():
                     outbound_flight_details_box = gr.Markdown()
                     with gr.Row():
                         outbound_details_go_back_button = gr.Button("Go Back")
-                        outbound_booking_options_button = gr.Button("Finalise Flight", visible=False)  # Initially hidden
-                        get_return_flights_button = gr.Button("Get Return Flights", visible=False)  # Initially hidden
-                        # elif initial_flight_payload.get("type") == 1:
-
+                        outbound_booking_options_button = gr.Button("Finalise Flight", visible=False)
+                        get_return_flights_button = gr.Button("Get Return Flights", visible=False)
+                        
                 with gr.Column(visible=False) as return_flight_cards:
                     with gr.Row():
                         return_card_html_components = []
@@ -187,13 +244,10 @@ def create_travel_app():
                     with gr.Row():
                         return_flights_go_back_button = gr.Button("Go Back")
                         return_view_flight_button = gr.Button("View Flight", interactive=False, elem_id="confirm-button")
-
                 
                 with gr.Column(visible=False) as return_flight_details:
                     return_flight_details_box = gr.Markdown()
                     with gr.Row():
-                        # if initial_flight_payload:
-                            # if initial_flight_payload.get("type") == 1 and initial_flight_payload.get("departure_token"):
                         return_details_go_back_button = gr.Button("Go Back")
                         return_booking_options_button = gr.Button("Finalise Flight")
                 
@@ -237,7 +291,7 @@ def create_travel_app():
             outputs=[chatbot, outbound_flights_state, initial_flight_payload]
         ).then(
             fn=UIManager.update_flight_interface,
-            inputs=[outbound_flights_state],
+            inputs=outbound_flights_state,
             outputs=[flight_section] + outbound_card_html_components + outbound_card_containers
         ).then(
             fn=update_button_visibility,
@@ -251,7 +305,7 @@ def create_travel_app():
             outputs=[chatbot, outbound_flights_state, initial_flight_payload]
         ).then(
             fn=UIManager.update_flight_interface,
-            inputs=[outbound_flights_state],
+            inputs=outbound_flights_state,
             outputs=[flight_section] + outbound_card_html_components + outbound_card_containers
         ).then(
             fn=update_button_visibility,
@@ -330,16 +384,13 @@ def create_travel_app():
 
         # (7) use clicks on "go back" button -> outbound flight details are shown again
         return_flights_go_back_button.click(
-            fn=lambda: (VIEW_OUTBOUND_DETAILS),
-            outputs=[current_view]
+            fn=UIManager.get_flight_details,
+            inputs=[selected_outbound_index, outbound_flights_state, initial_flight_payload],
+            outputs=[current_view, outbound_flight_details_box]
         ).then(
             fn=UIManager.update_view,
             inputs=current_view,
             outputs=[outbound_flight_cards, return_flight_cards, outbound_flight_details, return_flight_details, flight_booking_section]
-        ).then(
-            fn=build_details,
-            inputs=[selected_outbound_index, outbound_flights_state],
-            outputs=outbound_flight_details_box
         )
 
         # (8) user clicks on "view flight" button -> return flight details are shown
@@ -384,13 +435,33 @@ def create_travel_app():
 
         # (11) user clicks on "reset" button -> everything is reset
         reset_button.click(
-            fn=travel_agent.reset,
-            inputs=[],
-            outputs=[message, chatbot, thread_id_state, outbound_flights_state]
-        ).then(
-            fn=UIManager.update_flight_interface,
-            inputs=outbound_flights_state,
-            outputs=[flight_section] + outbound_card_html_components + outbound_card_containers
+            fn=complete_reset,
+            outputs=[
+                # Basic inputs/outputs
+                message, chatbot, thread_id_state,
+
+                # State variables
+                current_view, initial_flight_payload, outbound_flights_state,
+                selected_outbound_index, return_flights_state, selected_return_index, booking_data_state,
+                
+                # UI visibility
+                flight_section,
+                
+                # Outbound flight cards
+                *outbound_card_html_components, *outbound_card_containers, outbound_view_flight_button,
+                
+                # Outbound flight details
+                outbound_flight_details_box, outbound_booking_options_button, get_return_flights_button,
+                
+                # Return flight cards
+                *return_card_html_components, *return_card_containers, return_view_flight_button,
+                
+                # Return flight details
+                return_flight_details_box,
+                
+                # Booking section
+                *booking_groups, *info_mds, *booking_buttons, *booking_results
+            ]
         )
 
     return demo
