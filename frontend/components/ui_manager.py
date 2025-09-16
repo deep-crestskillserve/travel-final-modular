@@ -2,7 +2,8 @@ import gradio as gr
 from typing import List, Dict
 from utils.helpers import format_duration, build_details, ordinal
 import json
-import httpx
+# import httpx
+import requests
 from utils.logger import logger
 logger = logger()
 
@@ -104,21 +105,30 @@ class UIManager:
 
     @staticmethod
     def get_flight_details(selected: int, flight_data: Dict, params: Dict):
+        if not flight_data or not flight_data.get("flights"):
+            return VIEW_OUTBOUND_CARDS, "No flight data available"  # Fallback to cards view on error
         
-        print(f"Showing flight details for {ordinal(selected)} flight")
+        print(f"Showing flight details for {ordinal(selected + 1)} flight")
         print(f"params: {json.dumps(params, indent=2)}")
+
+        flights_list = flight_data.get("flights", [])
+        if selected < 0 or selected >= len(flights_list):
+            return VIEW_OUTBOUND_CARDS, "Invalid flight selection"
+
+        details = build_details(selected, flight_data)
+
         view_return = 1 if flight_data.get("flights")[0].get("departure_token") else 0
-        if view_return:
-            return VIEW_RETURN_DETAILS, build_details(selected, flight_data)
-        else:
-            return VIEW_OUTBOUND_DETAILS, build_details(selected, flight_data)
+        
         if params.get("return_date"):
-            return VIEW_OUTBOUND_DETAILS, build_details(selected, flight_data)
+            # Round-trip: Distinguish based on departure_token
+            if flights_list[0].get("departure_token"):
+                return VIEW_OUTBOUND_DETAILS, details
+            else:
+                return VIEW_RETURN_DETAILS, details
+        
         else:
-            if params.get("departure_token"):
-                return VIEW_RETURN_DETAILS, build_details(selected, flight_data)
-            elif params.get("booking_token"):
-                return VIEW_BOOKING, build_details(selected, flight_data)
+            # One-way: Always outbound
+            return VIEW_OUTBOUND_DETAILS, details
 
     @staticmethod
     async def on_get_return_flights(selected: int, flight_data: Dict, initial_payload: Dict):
@@ -137,20 +147,17 @@ class UIManager:
             "departure_token": departure_token
         }
         flight_data = {}
-        async with httpx.AsyncClient(timeout=httpx.Timeout(90.0)) as client:
-            try:
-                response = await client.get(f"{BASE_URL}/return-flights", params=departure_input)
-                response.raise_for_status()
-                flight_data = response.json()
-            except httpx.HTTPStatusError as e:
-                logger.error(f"FastAPI server error: {e.response.status_code} - {e.response.text}")
-                raise  # Propagate the error to the caller
-            except httpx.RequestError as e:
-                logger.error(f"Network error contacting FastAPI server: {e}")
-                raise 
-
-        print("Return flights loaded")
-        return VIEW_RETURN_CARDS, flight_data
+        try:
+            # Use synchronous requests instead of async httpx
+            # response = await client.get(f"{BASE_URL}/return-flights", params=departure_input)
+            response = requests.get(f"{BASE_URL}/return-flights", params=departure_input, timeout=90)
+            response.raise_for_status()
+            flight_data = response.json()
+            print("Return flights loaded")
+            return VIEW_RETURN_CARDS, flight_data
+        except requests.RequestException as e:
+            logger.error(f"Error fetching return flights: {e}")
+            return VIEW_RETURN_CARDS, {"error": f"Failed to fetch return flights: {str(e)}"}
 
     @staticmethod
     async def on_booking_options(selected: int, flight_data: Dict, initial_payload: Dict):
@@ -170,20 +177,16 @@ class UIManager:
             "booking_token": booking_token,
         }
         booking_data = {}
-        async with httpx.AsyncClient(timeout=httpx.Timeout(90.0)) as client:
-            try:
-                response = await client.get(f"{BASE_URL}/bookingdata", params=booking_input)
-                response.raise_for_status()
-                booking_data = response.json()
-            except httpx.HTTPStatusError as e:
-                logger.error(f"FastAPI server error: {e.response.status_code} - {e.response.text}")
-                raise  # Propagate the error to the caller
-            except httpx.RequestError as e:
-                logger.error(f"Network error contacting FastAPI server: {e}")
-                raise
-
-        print("Booking options loaded")
-        return VIEW_BOOKING, booking_data
+        try:
+            # Use synchronous requests instead of async httpx
+            response = requests.get(f"{BASE_URL}/bookingdata", params=booking_input, timeout=90)
+            response.raise_for_status()
+            booking_data = response.json()
+            print("Booking options loaded")
+            return VIEW_BOOKING, booking_data
+        except requests.RequestException as e:
+            logger.error(f"Error fetching booking options: {e}")
+            return VIEW_BOOKING, {"error": f"Failed to fetch booking options: {str(e)}"}
 
     @staticmethod
     def update_view(view: str):
