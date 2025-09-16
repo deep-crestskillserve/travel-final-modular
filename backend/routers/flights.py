@@ -2,13 +2,15 @@ import os
 import json
 import httpx
 import urllib.parse
-from utils.logger import logger
 from typing import Optional, Union
+from dotenv import load_dotenv
+from shared_utils.logger import get_logger
 from backend.utils import merge_flights_fields
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field, field_validator
-logger = logger()
+logger = get_logger()
 
+load_dotenv(override=True)
 router = APIRouter(prefix="/api", tags=["flights"])
 
 serpapi_key = os.getenv("SERPAPI_API_KEY")
@@ -58,7 +60,7 @@ class FlightBookingInput(FlightsInput):
 
 async def fetch_flights_data(params: Union[FlightsInput, FlightBookingInput, ReturnFlightsInput]):
     """ Fetch flight data from SerpAPI based on the provided parameters for outbound flights, return flights, or booking options. """
-    
+
     params_dict = params.model_dump()
     if(params_dict.get("return_date")):
         params_dict["type"] = 1

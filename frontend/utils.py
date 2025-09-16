@@ -1,8 +1,8 @@
 import re
 import requests
+from shared_utils.logger import get_logger
 from typing import Optional, List, Dict
-from utils.logger import logger
-logger = logger()
+logger = get_logger()
 def format_duration(minutes: Optional[int]) -> str:
     if minutes is None:
         return ""

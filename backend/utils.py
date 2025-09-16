@@ -1,7 +1,8 @@
 import os
 import time
 import httpx
-
+from dotenv import load_dotenv
+load_dotenv(override=True)
 _access_token = None
 _token_expiry = 0
 
@@ -36,7 +37,7 @@ async def get_access_token():
 
 def merge_flights_fields(data: dict) -> dict:
     """" Merging 'best_flights' and 'other_flights' into single 'flights' list. """
-    
+
     best = data.get("best_flights", [])
     other = data.get("other_flights", [])
 

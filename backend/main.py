@@ -1,10 +1,7 @@
 from fastapi import FastAPI
-from dotenv import load_dotenv
 from backend.routers.flights import router as flights_router
 from backend.routers.airports import router as airports_router
 from backend.routers.geolocation import router as geolocation_router
-
-load_dotenv(override=True)
 
 app = FastAPI()
 app.include_router(geolocation_router)

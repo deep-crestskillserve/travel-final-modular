@@ -1,12 +1,14 @@
 import os
 import httpx
 import urllib.parse
-from utils.logger import logger
+from dotenv import load_dotenv
 from typing import Optional, Dict
+from shared_utils.logger import get_logger
 from fastapi import APIRouter, HTTPException
 
+load_dotenv(override=True)
 router = APIRouter(prefix="/api", tags=["geolocation"])
-logger = logger()
+logger = get_logger()
 async def fetch_geolocation(location: str) -> Optional[Dict[str, float]]:
     """
     Fetches geolocation (latitude, longitude) for a given location using Google Geocoding API.
@@ -21,7 +23,7 @@ async def fetch_geolocation(location: str) -> Optional[Dict[str, float]]:
         ValueError: If the location is invalid or the API key is missing.
         HTTPException: If the API request fails or returns an error status.
     """
-    
+
     if not location or not location.strip():
         raise ValueError("Location cannot be empty")
 

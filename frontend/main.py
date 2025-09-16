@@ -1,8 +1,7 @@
-# Gradio App Setup
 import gradio as gr
+from frontend.utils import book_flight
 from frontend.components.ui_manager import UIManager
 from backend.agents.travel_agent import TravelAgent
-from utils.helpers import book_flight
 
 MAX_FLIGHTS = 20
 MAX_BOOKING_OPTIONS = 10
@@ -86,6 +85,14 @@ CSS = """
     }
     #details-section {
         margin-top: 20px;
+    }
+    #flight-container {
+        max-height: 600px;
+        overflow-y: auto;
+        padding: 8px;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        background: white;
     }
 """
 
@@ -195,92 +202,95 @@ def create_travel_app():
             with gr.Column():
                 chatbot = gr.Chatbot(label="Travel Chatbot", height=600, type="messages")
             
-            with gr.Column(visible=False) as flight_section:
-                gr.Markdown("# 🛫 Available Flights")
-                
-                with gr.Column(visible=True) as outbound_flight_cards:
-                    with gr.Row():
-                        outbound_card_html_components = []
-                        outbound_card_containers = []
-                        for card_index in range(MAX_FLIGHTS):
-                            with gr.Column(elem_classes=["card-container"], visible=False) as card_col:
-                                card_html = gr.HTML("")
-                                card_button = gr.Button("", elem_classes=["click-overlay"])
-                                outbound_card_html_components.append(card_html)
-                                # the button is being binded to function upon click event
-                                card_button.click(
-                                    fn=lambda x=card_index: x,
-                                    outputs=selected_outbound_index
-                                ).then(
-                                    fn=UIManager.update_cards,
-                                    inputs=[selected_outbound_index, outbound_flights_state],
-                                    outputs=outbound_card_html_components
-                                )
-                            outbound_card_containers.append(card_col)
-                    outbound_view_flight_button = gr.Button("View Flight", interactive=False, elem_id="confirm-button")
-                
-                with gr.Column(visible=False) as outbound_flight_details:
-                    outbound_flight_details_box = gr.Markdown()
-                    with gr.Row():
-                        outbound_details_go_back_button = gr.Button("Go Back")
-                        outbound_booking_options_button = gr.Button("Finalise Flight", visible=False)
-                        get_return_flights_button = gr.Button("Get Return Flights", visible=False)
-                        
-                with gr.Column(visible=False) as return_flight_cards:
-                    with gr.Row():
-                        return_card_html_components = []
-                        return_card_containers = []
-                        for card_index in range(MAX_FLIGHTS):
-                            with gr.Column(elem_classes=["card-container"], visible=False) as card_col:
-                                card_html = gr.HTML("")
-                                card_button = gr.Button("", elem_classes=["click-overlay"])
-                                return_card_html_components.append(card_html)
-                                # the button is being binded to function upon click event
-                                card_button.click(
-                                    fn=lambda x=card_index: x,
-                                    outputs=selected_return_index
-                                ).then(
-                                    fn=UIManager.update_cards,
-                                    inputs=[selected_return_index, return_flights_state],
-                                    outputs=return_card_html_components
-                                )
-                            return_card_containers.append(card_col)
+            with gr.Column(visible=False, scale=1) as flight_section:
+                with gr.Group():
+                    gr.Markdown("## ✈️ Flights & Booking")
+                    
+                    with gr.Column(elem_id="flight-container", scale=1):
 
-                    with gr.Row():
-                        return_flights_go_back_button = gr.Button("Go Back")
-                        return_view_flight_button = gr.Button("View Flight", interactive=False, elem_id="confirm-button")
-                
-                with gr.Column(visible=False) as return_flight_details:
-                    return_flight_details_box = gr.Markdown()
-                    with gr.Row():
-                        return_details_go_back_button = gr.Button("Go Back")
-                        return_booking_options_button = gr.Button("Finalise Flight")
-                
-                with gr.Column(visible=False) as flight_booking_section:
-                    gr.Markdown("# Flight Booking Options")
-                    gr.Markdown("Select a booking option to proceed to the booking partner's website.")
-                    
-                    booking_groups = []
-                    info_mds = []
-                    booking_buttons = []
-                    booking_results = []
-                    
-                    for i in range(MAX_BOOKING_OPTIONS):
-                        with gr.Group(visible=False) as group:
-                            info_md = gr.Markdown("")
-                            btn = gr.Button("Book")
-                            result = gr.Markdown(label=f"Booking Result {i+1}")
+                        with gr.Column(visible=True) as outbound_flight_cards:
+                            with gr.Row():
+                                outbound_card_html_components = []
+                                outbound_card_containers = []
+                                for card_index in range(MAX_FLIGHTS):
+                                    with gr.Column(elem_classes=["card-container"], visible=False) as card_col:
+                                        card_html = gr.HTML("")
+                                        card_button = gr.Button("", elem_classes=["click-overlay"])
+                                        outbound_card_html_components.append(card_html)
+                                        # the button is being binded to function upon click event
+                                        card_button.click(
+                                            fn=lambda x=card_index: x,
+                                            outputs=selected_outbound_index
+                                        ).then(
+                                            fn=UIManager.update_cards,
+                                            inputs=[selected_outbound_index, outbound_flights_state],
+                                            outputs=outbound_card_html_components
+                                        )
+                                    outbound_card_containers.append(card_col)
+                            outbound_view_flight_button = gr.Button("View Flight", interactive=False, elem_id="confirm-button")
+                        
+                        with gr.Column(visible=False) as outbound_flight_details:
+                            outbound_flight_details_box = gr.Markdown()
+                            with gr.Row():
+                                outbound_details_go_back_button = gr.Button("Go Back")
+                                outbound_booking_options_button = gr.Button("Finalise Flight", visible=False)
+                                get_return_flights_button = gr.Button("Get Return Flights", visible=False)
+                                
+                        with gr.Column(visible=False) as return_flight_cards:
+                            with gr.Row():
+                                return_card_html_components = []
+                                return_card_containers = []
+                                for card_index in range(MAX_FLIGHTS):
+                                    with gr.Column(elem_classes=["card-container"], visible=False) as card_col:
+                                        card_html = gr.HTML("")
+                                        card_button = gr.Button("", elem_classes=["click-overlay"])
+                                        return_card_html_components.append(card_html)
+                                        # the button is being binded to function upon click event
+                                        card_button.click(
+                                            fn=lambda x=card_index: x,
+                                            outputs=selected_return_index
+                                        ).then(
+                                            fn=UIManager.update_cards,
+                                            inputs=[selected_return_index, return_flights_state],
+                                            outputs=return_card_html_components
+                                        )
+                                    return_card_containers.append(card_col)
+
+                            with gr.Row():
+                                return_flights_go_back_button = gr.Button("Go Back")
+                                return_view_flight_button = gr.Button("View Flight", interactive=False, elem_id="confirm-button")
+                        
+                        with gr.Column(visible=False) as return_flight_details:
+                            return_flight_details_box = gr.Markdown()
+                            with gr.Row():
+                                return_details_go_back_button = gr.Button("Go Back")
+                                return_booking_options_button = gr.Button("Finalise Flight")
+                        
+                        with gr.Column(visible=False) as flight_booking_section:
+                            gr.Markdown("# Flight Booking Options")
+                            gr.Markdown("Select a booking option to proceed to the booking partner's website.")
                             
-                            info_mds.append(info_md)
-                            booking_buttons.append(btn)
-                            booking_results.append(result)
+                            booking_groups = []
+                            info_mds = []
+                            booking_buttons = []
+                            booking_results = []
                             
-                            btn.click(
-                                fn=create_booking_handler(i),
-                                inputs=booking_data_state,
-                                outputs=booking_results[i]
-                            )
-                        booking_groups.append(group)
+                            for i in range(MAX_BOOKING_OPTIONS):
+                                with gr.Group(visible=False) as group:
+                                    info_md = gr.Markdown("")
+                                    btn = gr.Button("Book")
+                                    result = gr.Markdown(label=f"Booking Result {i+1}")
+                                    
+                                    info_mds.append(info_md)
+                                    booking_buttons.append(btn)
+                                    booking_results.append(result)
+                                    
+                                    btn.click(
+                                        fn=create_booking_handler(i),
+                                        inputs=booking_data_state,
+                                        outputs=booking_results[i]
+                                    )
+                                booking_groups.append(group)
 
         with gr.Group():
             with gr.Row():

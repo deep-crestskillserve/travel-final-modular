@@ -1,10 +1,11 @@
-import logging
-import json
-from datetime import datetime
 import sys
+import json
+import logging
+from datetime import datetime
 
 class JSONFormatter(logging.Formatter):
     def format(self, record):
+        """ Format log records as JSON """
         log_data = {
             'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3],
             'message': record.getMessage(),
@@ -15,9 +16,8 @@ class JSONFormatter(logging.Formatter):
             log_data['extra'] = record.extra_data
         return json.dumps(log_data)
 
-def logger(name='app_logger', level=logging.DEBUG):  # Set to DEBUG level
-    """ Set up a logger that outputs JSON formatted logs to stdout. """
-
+def get_logger(name='app_logger', level=logging.DEBUG):
+    """ Return a logger that outputs JSON formatted logs to stdout. """
     logger = logging.getLogger(name)
     logger.setLevel(level)
     console_handler = logging.StreamHandler(sys.stdout)
@@ -25,6 +25,7 @@ def logger(name='app_logger', level=logging.DEBUG):  # Set to DEBUG level
     logger.handlers = []
     logger.addHandler(console_handler)
     return logger
+
 
 # # Example with DEBUG level
 # if __name__ == "__main__":

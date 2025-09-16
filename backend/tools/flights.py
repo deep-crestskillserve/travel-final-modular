@@ -1,10 +1,10 @@
 import httpx
 from typing import Optional
-from utils.logger import logger
 from pydantic import BaseModel, Field
 from langchain_core.tools import tool
+from shared_utils.logger import get_logger
 
-logger = logger()
+logger = get_logger()
 
 BASE_URL = "http://localhost:8000/api"
 

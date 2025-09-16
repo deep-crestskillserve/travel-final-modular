@@ -4,6 +4,7 @@ import json
 import uuid
 from typing import Optional
 from datetime import datetime
+from dotenv import load_dotenv
 from pydantic import BaseModel
 from langgraph.prebuilt import ToolNode
 from typing import Annotated, List, Dict, Tuple
@@ -15,6 +16,7 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, Tool
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '..')))
 from backend.tools.airports import get_airport
 from backend.tools.flights import get_flights
+load_dotenv(override=True)
 
 class State(BaseModel):
     messages: Annotated[List, add_messages]

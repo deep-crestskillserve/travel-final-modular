@@ -1,10 +1,10 @@
-from utils.helpers import format_duration, build_details, ordinal
-from utils.logger import logger
-from typing import List, Dict
-import gradio as gr
 import requests
+import gradio as gr
+from typing import List, Dict
+from shared_utils.logger import get_logger
+from frontend.utils import format_duration, build_details, ordinal
 
-logger = logger()
+logger = get_logger()
 
 MAX_FLIGHTS = 20
 MAX_BOOKING_OPTIONS = 10
@@ -20,7 +20,7 @@ class UIManager:
     @staticmethod
     def get_card_html(idx: int, flight: Dict, selected: bool = False) -> str:
         """ Generate HTML for a flight card """
-        
+
         first = flight["flights"][0] if flight.get("flights") else {}
         last = flight["flights"][-1] if flight.get("flights") else {}
         stops = len(flight.get("flights", [])) - 1
