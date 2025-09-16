@@ -1,20 +1,13 @@
 import os
 import time
-import urllib.parse
 import httpx
-from dotenv import load_dotenv
-import json
-
-# Load environment variables
-load_dotenv(override=True)
 
 _access_token = None
 _token_expiry = 0
 
 async def get_access_token():
-    """
-    Fetches OAuth2 access token from Amadeus API.
-    """
+    """ Fetches OAuth2 access token from Amadeus API. """
+
     global _access_token, _token_expiry
     if _access_token and time.time() < _token_expiry:
         return _access_token
@@ -42,6 +35,8 @@ async def get_access_token():
     return _access_token
 
 def merge_flights_fields(data: dict) -> dict:
+    """" Merging 'best_flights' and 'other_flights' into single 'flights' list. """
+    
     best = data.get("best_flights", [])
     other = data.get("other_flights", [])
 

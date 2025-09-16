@@ -19,6 +19,8 @@ BASE_URL = "http://localhost:8000/api"
 class UIManager:
     @staticmethod
     def get_card_html(idx: int, flight: Dict, selected: bool = False) -> str:
+        """ Generate HTML for a flight card """
+        
         first = flight["flights"][0] if flight.get("flights") else {}
         last = flight["flights"][-1] if flight.get("flights") else {}
         stops = len(flight.get("flights", [])) - 1
@@ -42,6 +44,8 @@ class UIManager:
 
     @staticmethod
     def update_cards(selected: int, flight_data: Dict) -> List[str]:
+        """ Update flight cards HTML, highlighting the selected card """
+
         if selected is not None:
             logger.info(f"Selected {ordinal(selected + 1)} card, updating highlights")
         else:
@@ -58,7 +62,9 @@ class UIManager:
         return html_updates
 
     @staticmethod
-    def update_flight_interface(flight_data: Dict):        
+    def update_flight_interface(flight_data: Dict):
+        """ Update flight interface visibility and cards based on flight data """
+
         flights = flight_data.get("flights", []) if flight_data else []
         if not flights:
             return gr.update(visible=False), *[""]*MAX_FLIGHTS, *[gr.update(visible=False)]*MAX_FLIGHTS
@@ -82,6 +88,8 @@ class UIManager:
 
     @staticmethod
     def update_booking_ui(booking_data: Dict):
+        """ Update booking options UI based on booking data """
+
         logger.info(f"Loading booking options...")
         
         booking_options = booking_data.get("booking_options", []) if booking_data else []
@@ -108,6 +116,8 @@ class UIManager:
 
     @staticmethod
     def get_flight_details(selected: int, flight_data: Dict, params: Dict):
+        """ Get flight details view based on selected flight and trip type """
+
         flights = flight_data.get("flights", []) if flight_data else []
 
         if not flight_data or not flight_data.get("flights"):
@@ -139,7 +149,8 @@ class UIManager:
 
     @staticmethod
     def on_get_return_flights(selected: int, flight_data: Dict, initial_payload: Dict):
-        
+        """ Fetch return flights based on selected outbound flight """
+
         flights = flight_data.get("flights", []) if flight_data else []
         
         if selected < 0 or selected >= len(flights):
@@ -171,6 +182,7 @@ class UIManager:
 
     @staticmethod
     def on_booking_options(selected: int, flight_data: Dict, initial_payload: Dict):
+        """ Fetch booking options for the selected flight """
         
         flights = flight_data.get("flights", []) if flight_data else []
         
@@ -207,7 +219,8 @@ class UIManager:
 
     @staticmethod
     def update_view(view: str):
-        """Update visibility of different view sections"""
+        """ Update visibility of different view sections """
+
         if view == VIEW_OUTBOUND_CARDS:
             return (
                 gr.update(visible=True),   # outbound_flight_cards

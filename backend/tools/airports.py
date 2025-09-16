@@ -1,14 +1,18 @@
-from langchain_core.tools import tool
 import httpx
-BASE_URL = "http://localhost:8000/api"
 from utils.logger import logger
+from langchain_core.tools import tool
+
+BASE_URL = "http://localhost:8000/api"
+
 logger = logger()
+
 @tool
 async def get_airport(location: str):
     """
     Fetch the nearest airports information for a given location.
     Provides with IATA code required for making call to "get_flights" tools
     """
+    
     payload = {"location": location}
     async with httpx.AsyncClient(timeout=httpx.Timeout(90.0)) as client:
         try:

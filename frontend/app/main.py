@@ -90,10 +90,13 @@ CSS = """
 """
 
 def create_travel_app():
+    """ Create the Gradio travel app with all components and interactions """
+
     travel_agent = TravelAgent()
 
     def create_booking_handler(option_index):
-        """Create booking handler for specific option"""
+        """ Create booking handler for specific option """
+
         def handle_booking(booking_data):
             booking_options = booking_data.get("booking_options", []) if booking_data else []
             if option_index < len(booking_options):
@@ -103,7 +106,8 @@ def create_travel_app():
         return handle_booking
 
     def update_button_visibility(params):
-        """Update button visibility of outbound_flight_cards buttons based on trip type"""
+        """ Update button visibility of outbound_flight_cards buttons based on trip type """
+
         if not params:
             return gr.update(visible=False), gr.update(visible=False)
         
@@ -117,7 +121,8 @@ def create_travel_app():
             return gr.update(visible=True), gr.update(visible=False)
     
     def complete_reset():
-        """Complete reset of all states and UI components"""
+        """ Complete reset of all states and UI components """
+
         # Reset all state variables
         new_thread_id = travel_agent.make_thread_id()
         

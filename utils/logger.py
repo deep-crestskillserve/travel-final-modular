@@ -16,6 +16,8 @@ class JSONFormatter(logging.Formatter):
         return json.dumps(log_data)
 
 def logger(name='app_logger', level=logging.DEBUG):  # Set to DEBUG level
+    """ Set up a logger that outputs JSON formatted logs to stdout. """
+
     logger = logging.getLogger(name)
     logger.setLevel(level)
     console_handler = logging.StreamHandler(sys.stdout)

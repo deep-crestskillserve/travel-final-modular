@@ -1,13 +1,10 @@
-from langchain_core.tools import tool
-from typing import Optional
-from pydantic import BaseModel, Field
-from dotenv import load_dotenv
 import httpx
+from typing import Optional
 from utils.logger import logger
+from pydantic import BaseModel, Field
+from langchain_core.tools import tool
 
 logger = logger()
-
-load_dotenv(override=True)
 
 BASE_URL = "http://localhost:8000/api"
 

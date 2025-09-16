@@ -15,12 +15,16 @@ def format_duration(minutes: Optional[int]) -> str:
         return f"{mins} min"
 
 def extract_redirect_url(html_content: str) -> Optional[str]:
+    """ Extracts the redirect URL from HTML meta refresh tag. """
+
     match = re.search(r"content=\"0;url='(.*?)'\"", html_content, re.IGNORECASE)
     if match:
         return match.group(1)
     return None
 
 def book_flight(post_data: str) -> str:
+    """ Initiates flight booking by posting to Google and extracting the redirect URL. """
+    
     if not post_data:
         return "No booking link provided."
     url = "https://www.google.com/travel/clk/f"
@@ -42,6 +46,8 @@ def book_flight(post_data: str) -> str:
         return f"Error during booking: {str(e)}"
 
 def build_details(index: Optional[int], flights: List[Dict]) -> str:
+    """ Build detailed markdown for a selected flight option. """
+
     if index is None or index < 0 or index >= len(flights):
         return "Select a flight below to see full details"
     logger.info(f"Building details for {ordinal(index + 1)} flight")
@@ -79,7 +85,8 @@ def build_details(index: Optional[int], flights: List[Dict]) -> str:
     return details
 
 def ordinal(n: int) -> str:
-    """Convert integer into its ordinal representation (1 -> 1st, 2 -> 2nd, etc)."""
+    """ Convert integer into its ordinal representation (1 -> 1st, 2 -> 2nd, etc). """
+
     if 10 <= n % 100 <= 20:
         suffix = "th"
     else:

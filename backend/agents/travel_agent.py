@@ -1,21 +1,17 @@
 import os
+import sys
 import json
 import uuid
+from typing import Optional
 from datetime import datetime
-from typing import Annotated, List, Dict, Tuple
 from pydantic import BaseModel
+from langgraph.prebuilt import ToolNode
+from typing import Annotated, List, Dict, Tuple
 from langgraph.graph.message import add_messages
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 from langgraph.graph import END, StateGraph, START
 from langgraph.checkpoint.memory import MemorySaver
-from langgraph.prebuilt import ToolNode
-from dotenv import load_dotenv
-import sys
-from typing import Optional
-import gradio as gr
-
-load_dotenv(override=True)
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '..')))
 from backend.tools.airports import get_airport
 from backend.tools.flights import get_flights
@@ -45,6 +41,8 @@ class TravelAgent:
         self.graph = self._build_graph(system_message)
 
     def _build_graph(self, system_message):
+        """ Build the state graph for the travel agent """
+
         graph_builder = StateGraph(State)
         graph_builder.add_node("worker", lambda state: self._worker(state, system_message))
         graph_builder.add_node("tools", ToolNode(tools=self.TOOLS))
@@ -54,31 +52,33 @@ class TravelAgent:
         return graph_builder.compile(checkpointer=self.memory)
 
     def _worker(self, state: State, system_message: str):
+        """ Worker node to process messages and invoke the LLM with tools """
+
         messages = [SystemMessage(content=system_message)] + state.messages
         worker_llm = self.llm.bind_tools(self.TOOLS)
         response = worker_llm.invoke(messages)
-        print(json.dumps(state.model_dump(), indent=2, default=str))
-
+        # print(json.dumps(state.model_dump(), indent=2, default=str))
         return {'messages': [response]}
 
     def _worker_router(self, state: State) -> str:
-        last_message = state.messages[-1]
-        print("-"*50)
-        print(json.dumps(state.model_dump(), indent=2, default=str))
+        """ Decide whether to invoke tools or end the conversation """
 
+        last_message = state.messages[-1]
+        # print("-"*50)
+        # print(json.dumps(state.model_dump(), indent=2, default=str))
         if hasattr(last_message, "tool_calls") and last_message.tool_calls:
             return "tools"
         return END
 
     @staticmethod
     def make_thread_id() -> str:
+        """ Generate a unique thread ID """
+
         return str(uuid.uuid4())
 
     async def process_message(self, message: str, history: List, thread: str) -> Tuple[List, Dict, Dict, Dict]:
-        """"
-        process used message when user clicks "enter" or "go button" inside the chatbot
-        invokes the graph with the 
-        """
+        """ Process a user message and return updated history, flight data and original params """
+
         config = {"configurable": {"thread_id": thread}}
         # as the accumulator is add_message, the state message will be updated automatically
         state = State(messages=[HumanMessage(content=message)])
@@ -102,7 +102,8 @@ class TravelAgent:
         
 
     def _extract_flight_data_and_params(self, messages: List) -> Tuple[Dict, Optional[Dict]]:
-        """Extract flight data and original params from tool response messages"""
+        """ Extract flight data and original params from tool response messages """
+
         flight_data = {}
         original_params = None
 
@@ -131,5 +132,6 @@ class TravelAgent:
         return flight_data, original_params
 
     def _has_available_flights(self, flight_data: Dict) -> bool:
-        """Check if flight data contains available flights"""
+        """ Check if flight data contains available flights """
+        
         return bool(flight_data.get("flights"))

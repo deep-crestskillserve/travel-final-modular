@@ -2,15 +2,12 @@ import os
 import json
 import httpx
 import urllib.parse
-from dotenv import load_dotenv
 from utils.logger import logger
 from typing import Optional, Union
 from backend.utils import merge_flights_fields
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field, field_validator
-
 logger = logger()
-load_dotenv(override=True)
 
 router = APIRouter(prefix="/api", tags=["flights"])
 
@@ -37,6 +34,7 @@ class FlightsInput(BaseModel):
 
     @field_validator("adults", "children", mode="before")
     def validate_integers(cls, v):
+        """ Ensure that adults and children value is an integer and not a decimal. """
         if isinstance(v, float):
             if v.is_integer():
                 return int(v)
@@ -59,6 +57,8 @@ class FlightBookingInput(FlightsInput):
     booking_token: Optional[str] = Field(description="Token for flight booking options", default=None)
 
 async def fetch_flights_data(params: Union[FlightsInput, FlightBookingInput, ReturnFlightsInput]):
+    """ Fetch flight data from SerpAPI based on the provided parameters for outbound flights, return flights, or booking options. """
+    
     params_dict = params.model_dump()
     if(params_dict.get("return_date")):
         params_dict["type"] = 1
@@ -124,6 +124,7 @@ async def get_outbound_flights(
     ### Raises
     - **HTTPException**: If the params are invalid or SerpAPI fails  
     """
+    
     params = FlightsInput(
         departure_id=departure_id,
         arrival_id=arrival_id,
@@ -172,6 +173,7 @@ async def get_return_flights(
     ### Raises
     - **HTTPException**: If the params are invalid or SerpAPI fails  
     """
+    
     params = ReturnFlightsInput (
         departure_id=departure_id,
         arrival_id=arrival_id,
@@ -223,6 +225,7 @@ async def get_bookingdata(
     ### Raises
     - **HTTPException**: If the params are invalid or SerpAPI fails  
     """
+
     params = FlightBookingInput (
         departure_id=departure_id,
         arrival_id=arrival_id,
