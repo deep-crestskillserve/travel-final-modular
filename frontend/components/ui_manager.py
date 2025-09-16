@@ -105,30 +105,31 @@ class UIManager:
 
     @staticmethod
     def get_flight_details(selected: int, flight_data: Dict, params: Dict):
+        flights_list = flight_data.get("flights", [])
         if not flight_data or not flight_data.get("flights"):
             return VIEW_OUTBOUND_CARDS, "No flight data available"  # Fallback to cards view on error
         
-        print(f"Showing flight details for {ordinal(selected + 1)} flight")
-        print(f"params: {json.dumps(params, indent=2)}")
-
-        flights_list = flight_data.get("flights", [])
-        if selected < 0 or selected >= len(flights_list):
-            return VIEW_OUTBOUND_CARDS, "Invalid flight selection"
-
-        details = build_details(selected, flight_data)
-
-        view_return = 1 if flight_data.get("flights")[0].get("departure_token") else 0
-        
+        next_view = ""
         if params.get("return_date"):
             # Round-trip: Distinguish based on departure_token
             if flights_list[0].get("departure_token"):
-                return VIEW_OUTBOUND_DETAILS, details
+                next_view = VIEW_OUTBOUND_DETAILS
             else:
-                return VIEW_RETURN_DETAILS, details
-        
+                next_view = VIEW_RETURN_DETAILS
         else:
             # One-way: Always outbound
-            return VIEW_OUTBOUND_DETAILS, details
+            next_view = VIEW_OUTBOUND_DETAILS
+        
+        if selected < 0 or selected >= len(flights_list):
+            if next_view == VIEW_OUTBOUND_DETAILS:
+                return VIEW_OUTBOUND_CARDS, "Invalid flight selection"
+            else:
+                return VIEW_RETURN_CARDS, "Invalid flight selection"
+        print(f"Showing flight details for {ordinal(selected + 1)} flight")
+        print(f"params: {json.dumps(params, indent=2)}")
+
+        details = build_details(selected, flight_data)
+        return next_view, details
 
     @staticmethod
     async def on_get_return_flights(selected: int, flight_data: Dict, initial_payload: Dict):
@@ -164,6 +165,9 @@ class UIManager:
         flights = flight_data.get("flights", []) if flight_data else []
 
         booking_token = flights[selected].get("booking_token", "")
+        if not booking_token:
+            print("no booking token found for the selected flight.")
+            return VIEW_RETURN_DETAILS, {"error": "No booking token available"}  # Stay in current view
 
         print(f"Selected flight booking token: {booking_token}")
         print(f"Fetching booking options for {ordinal(selected)} flight")
