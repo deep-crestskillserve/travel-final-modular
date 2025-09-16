@@ -1,13 +1,13 @@
 import os
+import json
 import httpx
-from fastapi import APIRouter, HTTPException, Request, Query
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field, field_validator
-from typing import Optional, Union
-from utils.logger import logger
-from dotenv import load_dotenv
-from backend.utils import merge_flights_fields
 import urllib.parse
+from dotenv import load_dotenv
+from utils.logger import logger
+from typing import Optional, Union
+from backend.utils import merge_flights_fields
+from fastapi import APIRouter, HTTPException, Query
+from pydantic import BaseModel, Field, field_validator
 
 logger = logger()
 load_dotenv(override=True)
@@ -58,7 +58,7 @@ class ReturnFlightsInput(FlightsInput):
 class FlightBookingInput(FlightsInput):
     booking_token: Optional[str] = Field(description="Token for flight booking options", default=None)
 
-async def fetch_flights(params: Union[FlightsInput, FlightBookingInput, ReturnFlightsInput]):
+async def fetch_flights_data(params: Union[FlightsInput, FlightBookingInput, ReturnFlightsInput]):
     params_dict = params.model_dump()
     if(params_dict.get("return_date")):
         params_dict["type"] = 1
@@ -68,10 +68,8 @@ async def fetch_flights(params: Union[FlightsInput, FlightBookingInput, ReturnFl
 
     if "departure_token" in params_dict and params_dict["departure_token"]:
         params_dict["departure_token"] = urllib.parse.unquote(params_dict["departure_token"])
-        logger.info(f"Raw departure_token: {params_dict['departure_token']}")
     if "booking_token" in params_dict and params_dict["booking_token"]:
         params_dict["booking_token"] = urllib.parse.unquote(params_dict["booking_token"])
-        logger.info(f"Raw booking_token: {params_dict['booking_token']}")
 
     query_params = SERPAPI_PARAMETERS | params_dict
 
@@ -135,7 +133,9 @@ async def get_outbound_flights(
         return_date=return_date
     )
     try:
-        result = await fetch_flights(params)
+        logger.info(f"Fetching outbound flights")
+        logger.info(f"params: {json.dumps(params.model_dump(), indent=2)}")
+        result = await fetch_flights_data(params)
         return result
     except HTTPException as e:
         logger.error(f"Failed to fetch booking data: {e.status_code} - {e.detail}")
@@ -183,7 +183,9 @@ async def get_return_flights(
     )
     
     try:
-        result = await fetch_flights(params)
+        logger.info(f"Fetching return flights")
+        logger.info(f"params: {json.dumps(params.model_dump(), indent=2)}")
+        result = await fetch_flights_data(params)
         return result
     except HTTPException as e:
         logger.error(f"Failed to fetch booking data: {e.status_code} - {e.detail}")
@@ -231,7 +233,9 @@ async def get_bookingdata(
         booking_token=booking_token
     )
     try:
-        result = await fetch_flights(params)
+        logger.info(f"Fetching booking options")
+        logger.info(f"params: {json.dumps(params.model_dump(), indent=2)}")
+        result = await fetch_flights_data(params)
         return result
     except HTTPException as e:
         logger.error(f"Failed to fetch booking data: {e.status_code} - {e.detail}")

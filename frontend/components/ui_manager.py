@@ -44,9 +44,9 @@ class UIManager:
     @staticmethod
     def update_cards(selected: int, flight_data: Dict) -> List[str]:
         if selected is not None:
-            print(f"Selected {ordinal(selected + 1)} card, updating highlights")
+            logger.info(f"Selected {ordinal(selected + 1)} card, updating highlights")
         else:
-            print("Reloading flight cards")
+            logger.info("Reloading flight cards")
 
         flights = flight_data.get("flights", []) if flight_data else []
         
@@ -59,11 +59,12 @@ class UIManager:
         return html_updates
 
     @staticmethod
-    def update_flight_interface(flight_data: Dict):
-        if(flight_data):
-            print(f"loading outbound flights")
-        
+    def update_flight_interface(flight_data: Dict):        
         flights = flight_data.get("flights", []) if flight_data else []
+        if flights[0].get("departure_token"):
+            logger.info("displaying outbound flights")
+        else:
+            logger.info("displaying return flights")
 
         visible = bool(flights)
         html_updates = []
@@ -79,7 +80,7 @@ class UIManager:
 
     @staticmethod
     def update_booking_ui(booking_data: Dict):
-        print(f"Loading booking options...")
+        logger.info(f"Loading booking options...")
         
         booking_options = booking_data.get("booking_options", []) if booking_data else []
         group_visibles = []
@@ -105,14 +106,15 @@ class UIManager:
 
     @staticmethod
     def get_flight_details(selected: int, flight_data: Dict, params: Dict):
-        flights_list = flight_data.get("flights", [])
+        flights = flight_data.get("flights", []) if flight_data else []
+
         if not flight_data or not flight_data.get("flights"):
             return VIEW_OUTBOUND_CARDS, "No flight data available"  # Fallback to cards view on error
         
         next_view = ""
         if params.get("return_date"):
             # Round-trip: Distinguish based on departure_token
-            if flights_list[0].get("departure_token"):
+            if flights[0].get("departure_token"):
                 next_view = VIEW_OUTBOUND_DETAILS
             else:
                 next_view = VIEW_RETURN_DETAILS
@@ -120,41 +122,43 @@ class UIManager:
             # One-way: Always outbound
             next_view = VIEW_OUTBOUND_DETAILS
         
-        if selected < 0 or selected >= len(flights_list):
+        if selected < 0 or selected >= len(flights):
             if next_view == VIEW_OUTBOUND_DETAILS:
                 return VIEW_OUTBOUND_CARDS, "Invalid flight selection"
             else:
                 return VIEW_RETURN_CARDS, "Invalid flight selection"
-        print(f"Showing flight details for {ordinal(selected + 1)} flight")
-        print(f"params: {json.dumps(params, indent=2)}")
+        logger.info(f"Showing flight details for {ordinal(selected + 1)} flight")
 
         details = build_details(selected, flight_data)
         return next_view, details
 
     @staticmethod
     async def on_get_return_flights(selected: int, flight_data: Dict, initial_payload: Dict):
+        
         flights = flight_data.get("flights", []) if flight_data else []
+        
+        if selected < 0 or selected >= len(flights):
+            return VIEW_RETURN_CARDS, {"error": "Invalid flight selection"}
+        
         departure_token = flights[selected].get("departure_token", "")
+        if not departure_token:
+            logger.error(f"No departure token found for the {ordinal(selected + 1)} flight.")
+            return VIEW_RETURN_CARDS, {"error": f"No departure token available for {ordinal(selected + 1)} flight"}
         
         logger.info(f"Selected flight departure token: {departure_token}")
         logger.info(f"Fetching return flights for the {ordinal(selected + 1)} flight")
-        
-        if not departure_token:
-            logger.info("No departure token found for selected flight.")
-            return VIEW_RETURN_CARDS, {"error": "No departure token available"}
         
         departure_input = {
             **initial_payload,
             "departure_token": departure_token
         }
-        flight_data = {}
+
         try:
             # Use synchronous requests instead of async httpx
-            # response = await client.get(f"{BASE_URL}/return-flights", params=departure_input)
             response = requests.get(f"{BASE_URL}/return-flights", params=departure_input, timeout=90)
             response.raise_for_status()
             flight_data = response.json()
-            print("Return flights loaded")
+            logger.info("Return flights loaded")
             return VIEW_RETURN_CARDS, flight_data
         except requests.RequestException as e:
             logger.error(f"Error fetching return flights: {e}")
@@ -162,19 +166,24 @@ class UIManager:
 
     @staticmethod
     async def on_booking_options(selected: int, flight_data: Dict, initial_payload: Dict):
+        
         flights = flight_data.get("flights", []) if flight_data else []
+        
+        error_view = ""
+        if initial_payload.get("return_date"):
+            error_view = VIEW_RETURN_DETAILS
+        else:
+            error_view = VIEW_OUTBOUND_DETAILS
+        if selected < 0 or selected >= len(flights):
+            return error_view, {"error": "Invalid flight selection"}
 
         booking_token = flights[selected].get("booking_token", "")
         if not booking_token:
-            print("no booking token found for the selected flight.")
-            return VIEW_RETURN_DETAILS, {"error": "No booking token available"}  # Stay in current view
+            logger.error(f"No booking token found for the {ordinal(selected + 1)} flight.")
+            return VIEW_RETURN_DETAILS, {"error": f"No booking token available for {ordinal(selected + 1)} flight"}
 
-        print(f"Selected flight booking token: {booking_token}")
-        print(f"Fetching booking options for {ordinal(selected)} flight")
-
-        if not booking_token:
-            print("no booking token found for the selected flight.")
-            return VIEW_BOOKING, {"error": "No booking token available"}
+        logger.info(f"Selected flight booking token: {booking_token}")
+        logger.info(f"Fetching booking options for {ordinal(selected + 1)} flight")
 
         booking_input = {
             **initial_payload,
@@ -186,7 +195,7 @@ class UIManager:
             response = requests.get(f"{BASE_URL}/bookingdata", params=booking_input, timeout=90)
             response.raise_for_status()
             booking_data = response.json()
-            print("Booking options loaded")
+            logger.info("Booking options loaded")
             return VIEW_BOOKING, booking_data
         except requests.RequestException as e:
             logger.error(f"Error fetching booking options: {e}")

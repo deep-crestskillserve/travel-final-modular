@@ -6,7 +6,8 @@ from fastapi import APIRouter, HTTPException
 from dotenv import load_dotenv
 load_dotenv(override=True)
 router = APIRouter(prefix="/api", tags=["geolocation"])
-
+from utils.logger import logger
+logger = logger()
 async def fetch_geolocation(location: str) -> Optional[Dict[str, float]]:
     """
     Fetches geolocation (latitude, longitude) for a given location using Google Geocoding API.
@@ -72,8 +73,9 @@ async def get_geolocation(location: str) -> Optional[Dict[str, float]]:
         HTTPException: If the location is invalid or the API request fails.
     """
     try:
+        logger.info(f"Fetching geolocation for: {location}")
         result = await fetch_geolocation(location)
-        return result if result else {"message": "No geolocation found for the provided location"}
+        return result if result else {"error": "No geolocation found for the provided location"}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except HTTPException as e:

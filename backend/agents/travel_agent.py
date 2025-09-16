@@ -95,6 +95,7 @@ class TravelAgent:
 
         flight_data, original_params = self._extract_flight_data_and_params(result["messages"])
         if self._has_available_flights(flight_data):
+            print("-"*50, "\n", original_params, "\n", "-"*50)
             history[-1]["content"] += "\n\nI've loaded the available flights in the panel to the right. Please select one to view details and booking options."
         
         return history, flight_data, original_params

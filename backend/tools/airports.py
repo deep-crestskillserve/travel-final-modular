@@ -7,7 +7,6 @@ logger = logger()
 async def get_airport(location: str):
     """
     Fetch the nearest airports information for a given location.
-    Returns the nearest airports data if found
     Provides with IATA code required for making call to "get_flights" tools
     """
     payload = {"location": location}

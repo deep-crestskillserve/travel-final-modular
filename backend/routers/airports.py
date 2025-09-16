@@ -1,6 +1,4 @@
-import os
 import httpx
-import time
 from typing import List, Dict, Optional
 from fastapi import APIRouter, HTTPException
 from utils.logger import logger
@@ -101,6 +99,7 @@ async def get_nearest_airports(location: str) -> Optional[List[Dict]]:
         HTTPException: If the location is invalid, geolocation fails, or the Amadeus API request fails.
     """
     try:
+        logger.info(f"Fetching releavant nearby airports for location: {location}")
         result = await get_airport(location)
         if not result:
             raise HTTPException(status_code=404, detail=f"No airports found near {location}")

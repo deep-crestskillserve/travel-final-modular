@@ -102,15 +102,19 @@ def create_travel_app():
         return handle_booking
 
     def update_button_visibility(params):
-        if(params):
-            type_ = 1 if params.get("return_date") else 2
-
-            if type_ == 2:  # One-way
-                return gr.update(visible=True), gr.update(visible=False)
-            elif type_ == 1:  # Round-trip
-                return gr.update(visible=False), gr.update(visible=True)
-        return gr.update(visible=False), gr.update(visible=False)
-
+        """Update button visibility of outbound_flight_cards buttons based on trip type"""
+        if not params:
+            return gr.update(visible=False), gr.update(visible=False)
+        
+        has_return_date = params.get("return_date") is not None
+        
+        if has_return_date: # Round-trip
+            # Show "Get Return Flights" button, hide "Finalise Flight" button
+            return gr.update(visible=False), gr.update(visible=True)
+        else:  # One-way
+            # Show "Finalise Flight" button, hide "Get Return Flights" button
+            return gr.update(visible=True), gr.update(visible=False)
+        
     with gr.Blocks(theme=gr.themes.Default(primary_hue="emerald"), css=CSS) as demo:
         gr.Markdown("Enter your travel query")
         
@@ -139,8 +143,8 @@ def create_travel_app():
                             with gr.Column(elem_classes=["card-container"], visible=False) as card_col:
                                 card_html = gr.HTML("")
                                 card_button = gr.Button("", elem_classes=["click-overlay"])
-                                # the button is being binded to function upon click event
                                 outbound_card_html_components.append(card_html)
+                                # the button is being binded to function upon click event
                                 card_button.click(
                                     fn=lambda x=card_index: x,
                                     outputs=selected_outbound_index
