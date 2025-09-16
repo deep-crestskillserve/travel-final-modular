@@ -61,6 +61,9 @@ class UIManager:
     @staticmethod
     def update_flight_interface(flight_data: Dict):        
         flights = flight_data.get("flights", []) if flight_data else []
+        if not flights:
+            return gr.update(visible=False), *[""]*MAX_FLIGHTS, *[gr.update(visible=False)]*MAX_FLIGHTS
+        
         if flights[0].get("departure_token"):
             logger.info("displaying outbound flights")
         else:

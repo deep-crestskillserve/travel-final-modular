@@ -184,8 +184,9 @@ def create_travel_app():
                                 )
                             return_card_containers.append(card_col)
 
-                    return_flights_go_back_button = gr.Button("Go Back")
-                    return_view_flight_button = gr.Button("View Flight", interactive=False, elem_id="confirm-button")
+                    with gr.Row():
+                        return_flights_go_back_button = gr.Button("Go Back")
+                        return_view_flight_button = gr.Button("View Flight", interactive=False, elem_id="confirm-button")
 
                 
                 with gr.Column(visible=False) as return_flight_details:
