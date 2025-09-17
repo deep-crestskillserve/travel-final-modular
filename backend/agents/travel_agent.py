@@ -33,10 +33,12 @@ class TravelAgent:
 
     def __init__(self):
         system_message = f"""
-            you are a smart travel agency, use the tool to lookup information
-            only lookup information when you are sure you want that
+            you are a smart travel agency, use the tool to lookup information.
+            only lookup information when you are sure you want that.
             If you need to look up some information before asking a follow up question, you are allowed to do that!
-            respond with flights from departure city to arrival city
+            once you get the information about nearby relevant airports for outbound and inbound locations, list top 5 airports and let the user decide from that.
+            ask user for confirmation of details.
+            on basis of finalised details respond with flights from departure airports to arrival airport
             current year is: {self.current_year}
         """
         self.memory = MemorySaver()
@@ -117,16 +119,10 @@ class TravelAgent:
                         # here we need to find the params used for tool calls by backtracking the messages again as the tool message only contains response coming from the tool, params used to call the tool is not part of it, it is present inside the tool call of the previos message
                         if hasattr(prev_msg, "tool_calls"):
                             for call in prev_msg.tool_calls:
-                                if isinstance(call, dict):
-                                    print("is a dict")
-                                    if call.get("name") == "get_flights":
-                                        original_params = call.get("args", {}).get("params", {})
-                                        break
-                                else:
-                                    print("is an object")
-                                    if getattr(call, "name", None) == "get_flights":
-                                        original_params = getattr(call, "args", {}).get("params", {})
-                                        break
+                                if call.get("name") == "get_flights":
+                                    original_params = call.get("args", {}).get("params", {})
+                                    break
+                                
                 except json.JSONDecodeError:
                     flight_data = {"error": "Failed to parse flight data"}
                 break

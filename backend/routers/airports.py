@@ -61,7 +61,7 @@ async def get_airport(location: str):
         params = {
             "latitude": lat,
             "longitude": lon,
-            "radius": 200  # Explicit radius in km
+            "radius": 500  # Explicit radius in km
         }
         headers = {"Authorization": f"Bearer {access_token}"}
         

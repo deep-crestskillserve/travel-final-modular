@@ -12,122 +12,274 @@ VIEW_RETURN_DETAILS = "return details"
 VIEW_BOOKING = "booking"
 
 CSS = """
-    .card-container {
-        position: relative;
-        width: 300px;
-        margin: 15px;
-        background: #1e293b;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
+/* Dark theme variables matching Gradio's dark mode */
+:root {
+    --flight-bg: #0b0f19;
+    --flight-surface: #1a1d29;
+    --flight-surface-hover: #252837;
+    --flight-border: #374151;
+    --flight-text: #f9fafb;
+    --flight-text-secondary: #d1d5db;
+    --flight-accent: #10b981;
+    --flight-accent-hover: #059669;
+    --flight-error: #ef4444;
+    --flight-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
 
-    .card {
-        padding: 20px;
-        color: #f1f5f9;
-        text-align: left;
-    }
+/* Flight section container - dark theme like chatbot */
+#flight-container {
+    display: flex !important;
+    flex-direction: column !important;
+    background: var(--flight-bg) !important;
+    border-radius: 8px !important;
+    border: 1px solid var(--flight-border) !important;
+    padding: 0 !important;
+    max-height: 600px !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    box-shadow: var(--flight-shadow) !important;
+}
 
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    }
+/* Main content area that can scroll */
+.flight-content {
+    flex: 1 1 auto !important;
+    padding: 1rem !important;
+    background: var(--flight-bg) !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+}
 
-    .logo-chain {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 15px;
-    }
+/* Sticky button container */
+.flight-buttons {
+    flex: 0 0 auto !important;
+    background: var(--flight-surface) !important;
+    border-top: 1px solid var(--flight-border) !important;
+    padding: 1rem !important;
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 20 !important;
+    width: 100% !important;
+}
 
-    .logo-chain img {
-        max-height: 40px;
-        width: auto;
-        filter: brightness(0) invert(1);
-    }
+/* Flight cards styling */
+.card-container {
+    background: var(--flight-surface) !important;
+    border: 1px solid var(--flight-border) !important;
+    border-radius: 6px !important;
+    margin: 0.5rem !important;
+    transition: all 0.2s ease !important;
+    position: relative !important;
+    overflow: visible !important;
+    max-height: none !important;
+}
 
-    .route {
-        font-weight: 600;
-        font-size: 16px;
-        color: #e2e8f0;
-        margin-bottom: 10px;
-    }
+.card-container:hover {
+    background: var(--flight-surface-hover) !important;
+    border-color: var(--flight-accent) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: var(--flight-shadow) !important;
+}
 
-    .price {
-        font-weight: 700;
-        color: #34d399;
-        font-size: 18px;
-        margin-bottom: 10px;
-    }
+.card-container.selected {
+    border-color: var(--flight-accent) !important;
+    background: var(--flight-surface-hover) !important;
+    box-shadow: var(--flight-shadow) !important;
+}
 
-    .duration {
-        font-size: 14px;
-        color: #94a3b8;
-        margin-bottom: 10px;
-    }
+/* Click overlay for cards */
+.click-overlay {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
+    z-index: 10 !important;
+}
 
-    .stops {
-        font-size: 14px;
-        color: #94a3b8;
-    }
+.flight-view {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+}
 
-    .click-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        opacity: 0;
-        cursor: pointer;
-        transition: opacity 0.3s ease;
-    }
+/* Flight details styling */
+.flight-details {
+    background: var(--flight-surface) !important;
+    border: 1px solid var(--flight-border) !important;
+    border-radius: 6px !important;
+    padding: 1.5rem !important;
+    color: var(--flight-text) !important;
+    line-height: 1.6 !important;
+    overflow-y: auto !important;
+    max-height: 500px !important;
+}
 
-    .click-overlay:hover {
-        opacity: 0.1;
-        background: #ffffff;
-    }
+.flight-details h1, .flight-details h2, .flight-details h3 {
+    color: var(--flight-text) !important;
+    margin-top: 1.5rem !important;
+    margin-bottom: 0.5rem !important;
+}
 
+.flight-details p, .flight-details li {
+    color: var(--flight-text-secondary) !important;
+    margin-bottom: 0.5rem !important;
+}
+
+/* Primary buttons styling */
+#confirm-button, .primary-btn {
+    background: var(--flight-accent) !important;
+    color: white !important;
+    border: none !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 6px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+    min-width: 120px !important;
+}
+
+#confirm-button:hover, .primary-btn:hover {
+    background: var(--flight-accent-hover) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: var(--flight-shadow) !important;
+}
+
+#confirm-button:disabled, .primary-btn:disabled {
+    background: #6b7280 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
+/* Secondary buttons styling */
+.secondary-btn {
+    background: var(--flight-surface) !important;
+    color: var(--flight-text) !important;
+    border: 1px solid var(--flight-border) !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 6px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+    min-width: 120px !important;
+}
+
+.secondary-btn:hover {
+    background: var(--flight-surface-hover) !important;
+    border-color: var(--flight-accent) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Loader styling */
+.loader-container {
+    background: var(--flight-surface) !important;
+    border: 1px solid var(--flight-border) !important;
+    border-radius: 6px !important;
+    padding: 2rem !important;
+    text-align: center !important;
+    color: var(--flight-text) !important;
+    overflow: visible !important; /* Ensure no scrolling */
+    max-height: none !important; /* Allow full height */
+}
+
+.loader {
+    border: 3px solid var(--flight-border) !important;
+    border-top: 3px solid var(--flight-accent) !important;
+    border-radius: 50% !important;
+    width: 40px !important;
+    height: 40px !important;
+    animation: spin 1s linear infinite !important;
+    margin: 0 auto 1rem auto !important;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loader-message {
+    color: var(--flight-text-secondary) !important;
+    margin: 0 !important;
+}
+
+/* Error message styling */
+.error-message {
+    background: rgba(239, 68, 68, 0.1) !important;
+    border: 1px solid var(--flight-error) !important;
+    border-radius: 6px !important;
+    padding: 1rem !important;
+    color: var(--flight-error) !important;
+    margin-bottom: 1rem !important;
+    overflow: visible !important; /* Ensure no scrolling */
+    max-height: none !important; /* Allow full height */
+}
+
+/* Card grid styling */
+.cards-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+    gap: 1rem !important;
+    padding-bottom: 1rem !important;
+    overflow-y: auto !important;
+    max-height: 500px !important;
+}
+
+/* Button row styling */
+.button-row {
+    display: flex !important;
+    gap: 0.75rem !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+}
+
+/* Scrollbar styling for dark theme */
+.flight-content::-webkit-scrollbar {
+    width: 12px !important;
+}
+
+.flight-content::-webkit-scrollbar-track {
+    background: var(--flight-bg) !important;
+    border-radius: 6px !important;
+}
+
+.flight-content::-webkit-scrollbar-thumb {
+    background: var(--flight-border) !important;
+    border-radius: 6px !important;
+    border: 2px solid var(--flight-bg) !important;
+}
+
+.flight-content::-webkit-scrollbar-thumb:hover {
+    background: #6b7280 !important;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
     #flight-container {
-        max-height: 600px;
-        overflow-y: auto;
-        padding: 15px;
-        background: #0f172a;
-        border-radius: 12px;
-        border: 1px solid #334155;
+        height: auto !important; /* Allow height to grow on mobile to avoid squishing */
+        max-height: 80vh !important;
     }
 
-    #confirm-button {
-        margin-top: 20px;
-        width: 100%;
-        background-color: #34d399;
-        color: #1e293b;
-        border: none;
-        padding: 10px;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
+    .button-row {
+        justify-content: center !important;
+    }
+    
+    .cards-grid {
+        grid-template-columns: 1fr !important;
+        max-height: 350px !important;
+    }
+    
+    .card-container {
+        max-height: none !important; /* Allow full card visibility on mobile */
     }
 
-    #confirm-button:hover {
-        background-color: #2dd4bf;
+    #confirm-button, .primary-btn, .secondary-btn {
+        min-width: 100px !important;
+        padding: 0.5rem 1rem !important;
     }
-
-    #details-section {
-        margin-top: 20px;
-        padding: 15px;
-        background: #1e293b;
-        border-radius: 12px;
-        color: #f1f5f9;
-    }
-
-    .chatbot {
-        background: #0f172a;
-        border-radius: 12px;
-        padding: 10px;
-        color: #f1f5f9;
-    }
+}
 """
 
 def create_travel_app():
@@ -151,10 +303,9 @@ def create_travel_app():
 
         if not params:
             return gr.update(visible=False), gr.update(visible=False)
-        
         has_return_date = params.get("return_date") is not None
         
-        if has_return_date: # Round-trip
+        if has_return_date:  # Round-trip
             # Show "Get Return Flights" button, hide "Finalise Flight" button
             return gr.update(visible=False), gr.update(visible=True)
         else:  # One-way
@@ -170,7 +321,7 @@ def create_travel_app():
         # Create empty card updates
         empty_card_html = [""] * MAX_FLIGHTS
         hidden_card_containers = [gr.update(visible=False)] * MAX_FLIGHTS
-        
+
         # Create empty booking updates
         hidden_booking_groups = [gr.update(visible=False)] * MAX_BOOKING_OPTIONS
         empty_info_updates = [""] * MAX_BOOKING_OPTIONS
@@ -218,6 +369,9 @@ def create_travel_app():
             *empty_info_updates,  # info_mds content
             *hidden_booking_buttons,  # booking_buttons visibility
             *empty_booking_results,  # booking_results content
+            gr.update(visible=False),  # loader_group
+            gr.update(value=""),  # loader_message
+            gr.update(visible=False),  # error_message
         )
 
     with gr.Blocks(theme=gr.themes.Default(primary_hue="emerald"), css=CSS) as demo:
@@ -234,95 +388,115 @@ def create_travel_app():
         
         with gr.Row():
             with gr.Column():
-                chatbot = gr.Chatbot(label="Travel Chatbot", height=600, type="messages")
+                chatbot = gr.Chatbot(label="Travel Chatbot", height=600, type="messages", elem_classes=["chatbot"])
             
             with gr.Column(visible=False, scale=1) as flight_section:
                 with gr.Group():                    
                     with gr.Column(elem_id="flight-container", scale=1):
+                        # Added: Loader group with spinner and dynamic message
+                        with gr.Group(elem_classes=["loader-container"], visible=False) as loader_group:
+                            loader = gr.HTML('<div class="loader"></div>')
+                            loader_message = gr.Markdown("", elem_classes=["loader-message"])
+                        # Added: Error message component
+                        error_message = gr.Markdown(visible=False, elem_classes=["error-message"])
 
-                        with gr.Column(visible=True) as outbound_flight_cards:
-                            with gr.Row():
-                                outbound_card_html_components = []
-                                outbound_card_containers = []
-                                for card_index in range(MAX_FLIGHTS):
-                                    with gr.Column(elem_classes=["card-container"], visible=False) as card_col:
-                                        card_html = gr.HTML("")
-                                        card_button = gr.Button("", elem_classes=["click-overlay"])
-                                        outbound_card_html_components.append(card_html)
-                                        # the button is being binded to function upon click event
-                                        card_button.click(
-                                            fn=lambda x=card_index: x,
-                                            outputs=selected_outbound_index
-                                        ).then(
-                                            fn=UIManager.update_cards,
-                                            inputs=[selected_outbound_index, outbound_flights_state],
-                                            outputs=outbound_card_html_components
-                                        )
-                                    outbound_card_containers.append(card_col)
-                            outbound_view_flight_button = gr.Button("View Flight", interactive=False, elem_id="confirm-button")
+                        with gr.Column(visible=True, elem_classes=["flight-view"]) as outbound_flight_cards:
+                            with gr.Column(elem_classes=["flight-content"]):
+                                with gr.Column(elem_classes=["cards-grid"]):
+                                    outbound_card_html_components = []
+                                    outbound_card_containers = []
+                                    for card_index in range(MAX_FLIGHTS):
+                                        with gr.Column(elem_classes=["card-container"], visible=False) as card_col:
+                                            card_html = gr.HTML("")
+                                            card_button = gr.Button("", elem_classes=["click-overlay"])
+                                            outbound_card_html_components.append(card_html)
+                                            # the button is being binded to function upon click event
+                                            card_button.click(
+                                                fn=lambda x=card_index: x,
+                                                outputs=selected_outbound_index
+                                            ).then(
+                                                fn=UIManager.update_cards,
+                                                inputs=[selected_outbound_index, outbound_flights_state],
+                                                outputs=outbound_card_html_components
+                                            )
+                                        outbound_card_containers.append(card_col)
+
+                            with gr.Column(elem_classes=["flight-buttons"]):
+                                outbound_view_flight_button = gr.Button("View Flight", interactive=False, elem_id="confirm-button") 
                         
-                        with gr.Column(visible=False) as outbound_flight_details:
-                            outbound_flight_details_box = gr.Markdown()
-                            with gr.Row():
-                                outbound_details_go_back_button = gr.Button("Go Back")
-                                outbound_booking_options_button = gr.Button("Finalise Flight", visible=False)
-                                get_return_flights_button = gr.Button("Get Return Flights", visible=False)
+                        with gr.Column(visible = False, elem_classes=["flight-view"]) as outbound_flight_details:
+                            with gr.Column(elem_classes=["flight-content"]):
+                                with gr.Column(elem_classes=["flight-details"]):
+                                    outbound_flight_details_box = gr.Markdown()
                                 
-                        with gr.Column(visible=False) as return_flight_cards:
-                            with gr.Row():
-                                return_card_html_components = []
-                                return_card_containers = []
-                                for card_index in range(MAX_FLIGHTS):
-                                    with gr.Column(elem_classes=["card-container"], visible=False) as card_col:
-                                        card_html = gr.HTML("")
-                                        card_button = gr.Button("", elem_classes=["click-overlay"])
-                                        return_card_html_components.append(card_html)
-                                        # the button is being binded to function upon click event
-                                        card_button.click(
-                                            fn=lambda x=card_index: x,
-                                            outputs=selected_return_index
-                                        ).then(
-                                            fn=UIManager.update_cards,
-                                            inputs=[selected_return_index, return_flights_state],
-                                            outputs=return_card_html_components
-                                        )
-                                    return_card_containers.append(card_col)
+                            with gr.Column(elem_classes=["flight-buttons"]):
+                                with gr.Row(elem_classes=["button-row"]):
+                                    outbound_details_go_back_button = gr.Button("Go Back", elem_classes=["secondary-btn"])
+                                    outbound_booking_options_button = gr.Button("Finalise Flight", visible=False, elem_classes=["primary-btn"])
+                                    get_return_flights_button = gr.Button("Get Return Flights", visible=False, elem_classes=["primary-btn"])
+                                
+                        with gr.Column(visible=False, elem_classes=["flight-view"]) as return_flight_cards:
+                            with gr.Column(elem_classes=["flight-content"]):
+                                with gr.Column(elem_classes=["cards-grid"]):
+                                    return_card_html_components = []
+                                    return_card_containers = []
+                                    for card_index in range(MAX_FLIGHTS):
+                                        with gr.Column(elem_classes=["card-container"], visible=False) as card_col:
+                                            card_html = gr.HTML("")
+                                            card_button = gr.Button("", elem_classes=["click-overlay"])
+                                            return_card_html_components.append(card_html)
+                                            # the button is being binded to function upon click event
+                                            card_button.click(
+                                                fn=lambda x=card_index: x,
+                                                outputs=selected_return_index
+                                            ).then(
+                                                fn=UIManager.update_cards,
+                                                inputs=[selected_return_index, return_flights_state],
+                                                outputs=return_card_html_components
+                                            )
+                                        return_card_containers.append(card_col)
 
-                            with gr.Row():
-                                return_flights_go_back_button = gr.Button("Go Back")
-                                return_view_flight_button = gr.Button("View Flight", interactive=False, elem_id="confirm-button")
+                            with gr.Column(elem_classes=["flight-buttons"]):
+                                with gr.Row(elem_classes=["button-row"]):
+                                    return_flights_go_back_button = gr.Button("Go Back", elem_classes=["secondary-btn"])
+                                    return_view_flight_button = gr.Button("View Flight", interactive=False, elem_id="confirm-button")
                         
-                        with gr.Column(visible=False) as return_flight_details:
-                            return_flight_details_box = gr.Markdown()
-                            with gr.Row():
-                                return_details_go_back_button = gr.Button("Go Back")
-                                return_booking_options_button = gr.Button("Finalise Flight")
+                        with gr.Column(visible=False, elem_classes=["flight-view"]) as return_flight_details:
+                            with gr.Column(elem_classes=["flight-content"]):
+                                with gr.Column(elem_classes=["flight-details"]):
+                                    return_flight_details_box = gr.Markdown()
+
+                            with gr.Column(elem_classes=["flight-buttons"]):
+                                with gr.Row(elem_classes=["button-row"]):
+                                    return_details_go_back_button = gr.Button("Go Back", elem_classes=["secondary-btn"])
+                                    return_booking_options_button = gr.Button("Finalise Flight", elem_classes=["primary-btn"])
                         
-                        with gr.Column(visible=False) as flight_booking_section:
-                            gr.Markdown("# Flight Booking Options")
-                            gr.Markdown("Select a booking option to proceed to the booking partner's website.")
+                        with gr.Column(visible=False, elem_classes=["flight-view"]) as flight_booking_section:
+                            with gr.Column(elem_classes=["flight-content"]):
+                                gr.Markdown("# Flight Booking Options")
+                                gr.Markdown("Select a booking option to proceed to the booking partner's website.")
                             
-                            booking_groups = []
-                            info_mds = []
-                            booking_buttons = []
-                            booking_results = []
+                                booking_groups = []
+                                info_mds = []
+                                booking_buttons = []
+                                booking_results = []
                             
-                            for i in range(MAX_BOOKING_OPTIONS):
-                                with gr.Group(visible=False) as group:
-                                    info_md = gr.Markdown("")
-                                    btn = gr.Button("Book")
-                                    result = gr.Markdown(label=f"Booking Result {i+1}")
+                                for i in range(MAX_BOOKING_OPTIONS):
+                                    with gr.Group(visible=False) as group:
+                                        info_md = gr.Markdown("")
+                                        btn = gr.Button("Book", elem_classes=["primary-btn"])
+                                        result = gr.Markdown(label=f"Booking Result {i+1}")
                                     
-                                    info_mds.append(info_md)
-                                    booking_buttons.append(btn)
-                                    booking_results.append(result)
+                                        info_mds.append(info_md)
+                                        booking_buttons.append(btn)
+                                        booking_results.append(result)
                                     
-                                    btn.click(
-                                        fn=create_booking_handler(i),
-                                        inputs=booking_data_state,
-                                        outputs=booking_results[i]
-                                    )
-                                booking_groups.append(group)
+                                        btn.click(
+                                            fn=create_booking_handler(i),
+                                            inputs=booking_data_state,
+                                            outputs=booking_results[i]
+                                        )
+                                    booking_groups.append(group)
 
         with gr.Group():
             with gr.Row():
@@ -333,9 +507,16 @@ def create_travel_app():
 
         # (0) user clicks on "go" button or "enter" inside the textbox -> message is processed and flight cards are shown if available
         message.submit(
+            fn=lambda: (gr.update(visible=True), gr.update(value="Fetching outbound flights..."), gr.update(visible=False)),
+            outputs=[loader_group, loader_message, error_message]
+        ).then(
             fn=travel_agent.process_message,
             inputs=[message, chatbot, thread_id_state],
             outputs=[chatbot, outbound_flights_state, initial_flight_payload]
+        ).then(
+            fn=lambda view, data: gr.update(visible=True, value=data.get("error", "")) if data.get("error") else gr.update(visible=False),
+            inputs=[current_view, outbound_flights_state],
+            outputs=error_message
         ).then(
             fn=UIManager.update_flight_interface,
             inputs=outbound_flights_state,
@@ -344,12 +525,22 @@ def create_travel_app():
             fn=update_button_visibility,
             inputs=initial_flight_payload,
             outputs=[outbound_booking_options_button, get_return_flights_button]
+        ).then(
+            fn=lambda: (gr.update(visible=False), gr.update(value="")),
+            outputs=[loader_group, loader_message]
         )
 
         go_button.click(
+            fn=lambda: (gr.update(visible=True), gr.update(value="Fetching outbound flights..."), gr.update(visible=False)),
+            outputs=[loader_group, loader_message, error_message]
+        ).then(
             fn=travel_agent.process_message,
             inputs=[message, chatbot, thread_id_state],
             outputs=[chatbot, outbound_flights_state, initial_flight_payload]
+        ).then(
+            fn=lambda view, data: gr.update(visible=True, value=data.get("error", "")) if data.get("error") else gr.update(visible=False),
+            inputs=[current_view, outbound_flights_state],
+            outputs=error_message
         ).then(
             fn=UIManager.update_flight_interface,
             inputs=outbound_flights_state,
@@ -358,6 +549,9 @@ def create_travel_app():
             fn=update_button_visibility,
             inputs=initial_flight_payload,
             outputs=[outbound_booking_options_button, get_return_flights_button]
+        ).then(
+            fn=lambda: (gr.update(visible=False), gr.update(value="")),
+            outputs=[loader_group, loader_message]
         )
         
         # (1) User clicks on the outbound flights cards -> view flight button becomes interactive
@@ -394,9 +588,16 @@ def create_travel_app():
 
         # (4) user clicks on "finalise flight" button -> booking options are shown (type = 2)
         outbound_booking_options_button.click(
+            fn=lambda: (gr.update(visible=True), gr.update(value="Fetching booking options..."), gr.update(visible=False)),
+            outputs=[loader_group, loader_message, error_message]
+        ).then(
             fn=UIManager.on_booking_options,
             inputs=[selected_outbound_index, outbound_flights_state, initial_flight_payload],
             outputs=[current_view, booking_data_state]
+        ).then(
+            fn=lambda view, data: gr.update(visible=True, value=data.get("error", "")) if data.get("error") else gr.update(visible=False),
+            inputs=[current_view, booking_data_state],
+            outputs=error_message
         ).then(
             fn=UIManager.update_view,
             inputs=current_view,
@@ -405,13 +606,23 @@ def create_travel_app():
             fn=UIManager.update_booking_ui,
             inputs=booking_data_state,
             outputs=booking_groups + info_mds + [b for b in booking_buttons]
+        ).then(
+            fn=lambda: (gr.update(visible=False), gr.update(value="")),
+            outputs=[loader_group, loader_message]
         )
 
         # (5) user clicks on "get return flights" button -> return flight cards are show (type = 1)
         get_return_flights_button.click(
+            fn=lambda: (gr.update(visible=True), gr.update(value="Fetching return flights..."), gr.update(visible=False)),
+            outputs=[loader_group, loader_message, error_message]
+        ).then(
             fn=UIManager.on_get_return_flights,
             inputs=[selected_outbound_index, outbound_flights_state, initial_flight_payload],
             outputs=[current_view, return_flights_state]
+        ).then(
+            fn=lambda view, data: gr.update(visible=True, value=data.get("error", "")) if data.get("error") else gr.update(visible=False),
+            inputs=[current_view, return_flights_state],
+            outputs=error_message
         ).then(
             fn=UIManager.update_view,
             inputs=current_view,
@@ -420,6 +631,9 @@ def create_travel_app():
             fn=UIManager.update_flight_interface,
             inputs=return_flights_state,
             outputs=[flight_section] + return_card_html_components + return_card_containers
+        ).then(
+            fn=lambda: (gr.update(visible=False), gr.update(value="")),
+            outputs=[loader_group, loader_message]
         )
 
         # (6) user clicks on any of the return flight cards -> view flight button becomes interactive
@@ -467,9 +681,16 @@ def create_travel_app():
 
         # (10) user clicks on "finalise flight" button -> booking options are shown
         return_booking_options_button.click(
+            fn=lambda: (gr.update(visible=True), gr.update(value="Fetching booking options..."), gr.update(visible=False)),
+            outputs=[loader_group, loader_message, error_message]
+        ).then(
             fn=UIManager.on_booking_options,
             inputs=[selected_return_index, return_flights_state, initial_flight_payload],
             outputs=[current_view, booking_data_state]
+        ).then(
+            fn=lambda view, data: gr.update(visible=True, value=data.get("error", "")) if data.get("error") else gr.update(visible=False),
+            inputs=[current_view, booking_data_state],
+            outputs=error_message
         ).then(
             fn=UIManager.update_view,
             inputs=current_view,
@@ -478,6 +699,9 @@ def create_travel_app():
             fn=UIManager.update_booking_ui,
             inputs=booking_data_state,
             outputs=booking_groups + info_mds + [b for b in booking_buttons]
+                ).then(
+            fn=lambda: (gr.update(visible=False), gr.update(value="")),
+            outputs=[loader_group, loader_message]
         )
 
         # (11) user clicks on "reset" button -> everything is reset
@@ -507,7 +731,8 @@ def create_travel_app():
                 return_flight_details_box,
                 
                 # Booking section
-                *booking_groups, *info_mds, *booking_buttons, *booking_results
+                *booking_groups, *info_mds, *booking_buttons, *booking_results,
+                loader_group, loader_message, error_message  # Added
             ]
         )
 

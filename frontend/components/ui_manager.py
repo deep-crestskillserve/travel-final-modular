@@ -33,7 +33,7 @@ class UIManager:
         )
         selected_class = "selected" if selected else ""
         return f"""
-        <div class="card {selected_class}" id="card-{idx}">
+        <div class="card card-container {selected_class}" id="card-{idx}">
             <div class="logo-chain">{logos}</div>
             <div class="route">{first.get('departure_airport', {}).get('id', '')} → {last.get('arrival_airport', {}).get('id', '')}</div>
             <div class="price">₹{flight.get('price', 'N/A')}</div>
@@ -119,6 +119,7 @@ class UIManager:
         """ Get flight details view based on selected flight and trip type """
 
         next_view = ""
+        flights = flight_data.get("flights", []) if flight_data else []
         if params.get("return_date"):
             # Round-trip: Check if these are return flights (no departure_token) or outbound flights (have departure_token)
             if flights[0].get("departure_token"):
@@ -129,7 +130,6 @@ class UIManager:
             # One-way: Always outbound
             next_view = VIEW_OUTBOUND_DETAILS
 
-        flights = flight_data.get("flights", []) if flight_data else []
 
         
         if selected < 0 or selected >= len(flights):

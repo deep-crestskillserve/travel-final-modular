@@ -1,7 +1,10 @@
 import re
+import certifi
 import requests
-from shared_utils.logger import get_logger
+from urllib3.util.retry import Retry
 from typing import Optional, List, Dict
+from requests.adapters import HTTPAdapter
+from shared_utils.logger import get_logger
 logger = get_logger()
 def format_duration(minutes: Optional[int]) -> str:
     if minutes is None:
@@ -32,8 +35,29 @@ def book_flight(post_data: str) -> str:
         post_data_value = post_data[2:]
     else:
         post_data_value = post_data
+
+    # Configure headers to mimic a browser
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Connection": "keep-alive"
+    }
+
+    # Set up a session with retry logic
+    session = requests.Session()
+    retries = Retry(total=3, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504])
+    session.mount("https://", HTTPAdapter(max_retries=retries))
+
     try:
-        response = requests.post(url, data={"u": post_data_value})
+        response = requests.post(
+            url, 
+            data={"u": post_data_value},
+            headers=headers,
+            verify=certifi.where(), 
+            timeout=10
+        )
+        # logger.info(f"post_data: {post_data_value}")
         if response.status_code == 200:
             redirect_url = extract_redirect_url(response.text)
             if redirect_url:
@@ -42,8 +66,10 @@ def book_flight(post_data: str) -> str:
                 return "Failed to extract redirect URL from response."
         else:
             return f"Failed to initiate booking. Status code: {response.status_code}"
-    except Exception as e:
-        return f"Error during booking: {str(e)}"
+    except requests.exceptions.SSLError as ssl_err:
+        return f"SSL Error during booking: {str(ssl_err)}. Check your network"
+    except requests.exceptions.RequestException as e:
+        return f"Error during booking: {str(e)}. Possible network issue or Google blocking the request."
 
 def build_details(index: Optional[int], flights: List[Dict]) -> str:
     """ Build detailed markdown for a selected flight option. """
