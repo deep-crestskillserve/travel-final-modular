@@ -118,14 +118,6 @@ class UIManager:
     def get_flight_details(selected: int, flight_data: Dict, params: Dict):
         """ Get flight details view based on selected flight and trip type """
 
-        flights = flight_data.get("flights", []) if flight_data else []
-
-        if not flight_data or not flight_data.get("flights"):
-            return VIEW_OUTBOUND_CARDS, "No flight data available"
-        
-        if selected < 0 or selected >= len(flights):
-            return VIEW_OUTBOUND_CARDS, {"error": "Invalid flight selection"}
-
         next_view = ""
         if params.get("return_date"):
             # Round-trip: Check if these are return flights (no departure_token) or outbound flights (have departure_token)
@@ -136,6 +128,9 @@ class UIManager:
         else:
             # One-way: Always outbound
             next_view = VIEW_OUTBOUND_DETAILS
+
+        flights = flight_data.get("flights", []) if flight_data else []
+
         
         if selected < 0 or selected >= len(flights):
             if next_view == VIEW_OUTBOUND_DETAILS:

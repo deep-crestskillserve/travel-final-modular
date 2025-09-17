@@ -14,62 +14,64 @@ VIEW_BOOKING = "booking"
 CSS = """
     .card-container {
         position: relative;
-        width: 250px;
-        margin: 10px;
-    }
-    .card {
-        border: 1px solid #d1d5db;
+        width: 300px;
+        margin: 15px;
+        background: #1e293b;
         border-radius: 12px;
-        padding: 16px;
-        text-align: center;
-        transition: 0.2s ease-in-out;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-        background: #fafafa;
-        width: 100%;
-        box-sizing: border-box;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
+
+    .card {
+        padding: 20px;
+        color: #f1f5f9;
+        text-align: left;
+    }
+
     .card:hover {
-        background: #f3f4f6;
-        transform: scale(1.02);
-        box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
     }
-    .card.selected {
-        border: 2px solid #2563eb;
-        box-shadow: 0 6px 14px rgba(0,0,0,0.2);
-        background: #eff6ff;
-    }
+
     .logo-chain {
         display: flex;
-        justify-content: center;
         align-items: center;
-        gap: 6px;
-        margin-bottom: 8px;
+        gap: 10px;
+        margin-bottom: 15px;
     }
+
     .logo-chain img {
-        max-height: 36px;
+        max-height: 40px;
         width: auto;
+        filter: brightness(0) invert(1);
     }
+
     .route {
-        font-weight: 700;
-        font-size: 18px;
-        color: #111827;
-        margin-bottom: 4px;
+        font-weight: 600;
+        font-size: 16px;
+        color: #e2e8f0;
+        margin-bottom: 10px;
     }
+
     .price {
         font-weight: 700;
-        color: #1d4ed8;
-        font-size: 16px;
-        margin-bottom: 4px;
+        color: #34d399;
+        font-size: 18px;
+        margin-bottom: 10px;
     }
+
     .duration {
         font-size: 14px;
-        color: #374151;
-        margin-bottom: 4px;
+        color: #94a3b8;
+        margin-bottom: 10px;
     }
+
     .stops {
         font-size: 14px;
-        color: #374151;
+        color: #94a3b8;
     }
+
     .click-overlay {
         position: absolute;
         top: 0;
@@ -78,21 +80,53 @@ CSS = """
         height: 100%;
         opacity: 0;
         cursor: pointer;
+        transition: opacity 0.3s ease;
     }
-    #confirm-button {
-        margin-top: 20px;
-        width: 100%;
+
+    .click-overlay:hover {
+        opacity: 0.1;
+        background: #ffffff;
     }
-    #details-section {
-        margin-top: 20px;
-    }
+
     #flight-container {
         max-height: 600px;
         overflow-y: auto;
-        padding: 8px;
-        border: 1px solid #e5e7eb;
+        padding: 15px;
+        background: #0f172a;
         border-radius: 12px;
-        background: white;
+        border: 1px solid #334155;
+    }
+
+    #confirm-button {
+        margin-top: 20px;
+        width: 100%;
+        background-color: #34d399;
+        color: #1e293b;
+        border: none;
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    #confirm-button:hover {
+        background-color: #2dd4bf;
+    }
+
+    #details-section {
+        margin-top: 20px;
+        padding: 15px;
+        background: #1e293b;
+        border-radius: 12px;
+        color: #f1f5f9;
+    }
+
+    .chatbot {
+        background: #0f172a;
+        border-radius: 12px;
+        padding: 10px;
+        color: #f1f5f9;
     }
 """
 
@@ -203,9 +237,7 @@ def create_travel_app():
                 chatbot = gr.Chatbot(label="Travel Chatbot", height=600, type="messages")
             
             with gr.Column(visible=False, scale=1) as flight_section:
-                with gr.Group():
-                    gr.Markdown("## ✈️ Flights & Booking")
-                    
+                with gr.Group():                    
                     with gr.Column(elem_id="flight-container", scale=1):
 
                         with gr.Column(visible=True) as outbound_flight_cards:
