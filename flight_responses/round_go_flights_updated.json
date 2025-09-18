@@ -1,0 +1,777 @@
+{
+  "search_metadata": {
+    "id": "68c7c6b2f8cc78ef9884056f",
+    "status": "Success",
+    "json_endpoint": "https://serpapi.com/searches/54b6f836da125df7/68c7c6b2f8cc78ef9884056f.json",
+    "created_at": "2025-09-15 07:56:34 UTC",
+    "processed_at": "2025-09-15 07:56:34 UTC",
+    "google_flights_url": "https://www.google.com/travel/flights?hl=en&gl=in&curr=INR&tfs=CBwQAhoeEgoyMDI1LTA5LTIwagcIARIDQU1EcgcIARIDTEhSGh4SCjIwMjUtMDktMjVqBwgBEgNMSFJyBwgBEgNBTURCBAEBAgJIAXABmAEB&tfu=EgIIAQ",
+    "raw_html_file": "https://serpapi.com/searches/54b6f836da125df7/68c7c6b2f8cc78ef9884056f.html",
+    "prettify_html_file": "https://serpapi.com/searches/54b6f836da125df7/68c7c6b2f8cc78ef9884056f.prettify",
+    "total_time_taken": 11.49
+  },
+  "search_parameters": {
+    "engine": "google_flights",
+    "hl": "en",
+    "gl": "in",
+    "type": "1",
+    "departure_id": "AMD",
+    "arrival_id": "LHR",
+    "outbound_date": "2025-09-20",
+    "return_date": "2025-09-25",
+    "adults": 2,
+    "children": 2,
+    "currency": "INR"
+  },
+  "price_insights": {
+    "lowest_price": 322732,
+    "price_level": "high",
+    "typical_price_range": [
+      215000,
+      305000
+    ]
+  },
+  "airports": [
+    {
+      "departure": [
+        {
+          "airport": {
+            "id": "AMD",
+            "name": "Sardar Vallabhbhai Patel International Airport"
+          },
+          "city": "Ahmedabad",
+          "country": "India",
+          "country_code": "IN",
+          "image": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRjpYKurWt2tPUXzl_C9sbJFY_9RfBpZ2GkMR6mQI05W-ZA_4vy1r5Lkt15MLx17YBGL6p8ryYdBbE-2Q",
+          "thumbnail": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQJEraVmaiQLSM_-c08TG-ZDfVb9mt-T21q6paXLUoRduQU2bEBE_l8ccQfdvxo4K12HKC7mJVgm20Q9qezldquyV1DvHr_Tr4TpzRIGRA"
+        }
+      ],
+      "arrival": [
+        {
+          "airport": {
+            "id": "LHR",
+            "name": "Heathrow Airport"
+          },
+          "city": "London",
+          "country": "United Kingdom",
+          "country_code": "GB",
+          "image": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRpN9RbtOSTDqKIPxWc_D6rdSysaWVh6d-NW7yz7yFXKRwh5RN5BpNIoXEwH1XVcFdLWqn6Sm8_Y_zmeg",
+          "thumbnail": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQYH83YXny8hR4M7k5BMFq4vUT6LNtVABQzgs2pg-hcpSZq3oMBOQK3xh591AAJv2Qx4uvFZUGqOVt4kuoCUOklISunmndJleOoSef_7QE"
+        }
+      ]
+    },
+    {
+      "departure": [
+        {
+          "airport": {
+            "id": "LHR",
+            "name": "Heathrow Airport"
+          },
+          "city": "London",
+          "country": "United Kingdom",
+          "country_code": "GB",
+          "image": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRpN9RbtOSTDqKIPxWc_D6rdSysaWVh6d-NW7yz7yFXKRwh5RN5BpNIoXEwH1XVcFdLWqn6Sm8_Y_zmeg",
+          "thumbnail": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQYH83YXny8hR4M7k5BMFq4vUT6LNtVABQzgs2pg-hcpSZq3oMBOQK3xh591AAJv2Qx4uvFZUGqOVt4kuoCUOklISunmndJleOoSef_7QE"
+        }
+      ],
+      "arrival": [
+        {
+          "airport": {
+            "id": "AMD",
+            "name": "Sardar Vallabhbhai Patel International Airport"
+          },
+          "city": "Ahmedabad",
+          "country": "India",
+          "country_code": "IN",
+          "image": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRjpYKurWt2tPUXzl_C9sbJFY_9RfBpZ2GkMR6mQI05W-ZA_4vy1r5Lkt15MLx17YBGL6p8ryYdBbE-2Q",
+          "thumbnail": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQJEraVmaiQLSM_-c08TG-ZDfVb9mt-T21q6paXLUoRduQU2bEBE_l8ccQfdvxo4K12HKC7mJVgm20Q9qezldquyV1DvHr_Tr4TpzRIGRA"
+        }
+      ]
+    }
+  ],
+  "flights": [
+    {
+      "flights": [
+        {
+          "departure_airport": {
+            "name": "Sardar Vallabhbhai Patel International Airport",
+            "id": "AMD",
+            "time": "2025-09-20 15:25"
+          },
+          "arrival_airport": {
+            "name": "Heathrow Airport",
+            "id": "LHR",
+            "time": "2025-09-20 20:20"
+          },
+          "duration": 565,
+          "airplane": "Boeing 787",
+          "airline": "Air India",
+          "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AI.png",
+          "travel_class": "Economy",
+          "flight_number": "AI 135",
+          "legroom": "33 in",
+          "extensions": [
+            "Above average legroom (33 in)",
+            "In-seat power & USB outlets",
+            "Stream media to your device",
+            "Carbon emissions estimate: 1853 kg"
+          ]
+        }
+      ],
+      "total_duration": 565,
+      "carbon_emissions": {
+        "this_flight": 1854000,
+        "typical_for_this_route": 2211000,
+        "difference_percent": -16
+      },
+      "price": 369670,
+      "type": "Round trip",
+      "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AI.png",
+      "departure_token": "WyJDalJJUXpkM1FuazJla1Z4YVRSQlIyMWxZM2RDUnkwdExTMHRMUzB0TFMxc2JXZDNOVUZCUVVGQlIycEllSEpqU1VFNE1qUkJFZ1ZCU1RFek5Sb0xDSWJJRmhBQUdnTkpUbEk0SEhEU3lSaz0iLFtbIkFNRCIsIjIwMjUtMDktMjAiLCJMSFIiLG51bGwsIkFJIiwiMTM1Il1dXQ=="
+    },
+    {
+      "flights": [
+        {
+          "departure_airport": {
+            "name": "Sardar Vallabhbhai Patel International Airport",
+            "id": "AMD",
+            "time": "2025-09-20 21:30"
+          },
+          "arrival_airport": {
+            "name": "Zayed International Airport",
+            "id": "AUH",
+            "time": "2025-09-20 23:05"
+          },
+          "duration": 185,
+          "airplane": "Airbus A320",
+          "airline": "Etihad",
+          "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/EY.png",
+          "travel_class": "Economy",
+          "flight_number": "EY 241",
+          "legroom": "30 in",
+          "extensions": [
+            "Average legroom (30 in)",
+            "In-seat USB outlet",
+            "Stream media to your device",
+            "Carbon emissions estimate: 710 kg"
+          ]
+        },
+        {
+          "departure_airport": {
+            "name": "Zayed International Airport",
+            "id": "AUH",
+            "time": "2025-09-21 02:20"
+          },
+          "arrival_airport": {
+            "name": "Heathrow Airport",
+            "id": "LHR",
+            "time": "2025-09-21 07:00"
+          },
+          "duration": 460,
+          "airplane": "Airbus A380",
+          "airline": "Etihad",
+          "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/EY.png",
+          "travel_class": "Economy",
+          "flight_number": "EY 61",
+          "legroom": "31 in",
+          "extensions": [
+            "Average legroom (31 in)",
+            "Wi-Fi for a fee",
+            "In-seat power & USB outlets",
+            "On-demand video",
+            "Carbon emissions estimate: 1660 kg"
+          ],
+          "overnight": true
+        }
+      ],
+      "layovers": [
+        {
+          "duration": 195,
+          "name": "Zayed International Airport",
+          "id": "AUH",
+          "overnight": true
+        }
+      ],
+      "total_duration": 840,
+      "carbon_emissions": {
+        "this_flight": 2371000,
+        "typical_for_this_route": 2211000,
+        "difference_percent": 7
+      },
+      "price": 371372,
+      "type": "Round trip",
+      "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/EY.png",
+      "departure_token": "WyJDalJJUXpkM1FuazJla1Z4YVRSQlIyMWxZM2RDUnkwdExTMHRMUzB0TFMxc2JXZDNOVUZCUVVGQlIycEllSEpqU1VFNE1qUkJFZ3BGV1RJME1YeEZXVFl4R2dzSXJOVVdFQUFhQTBsT1VqZ2NjTnZZR1E9PSIsW1siQU1EIiwiMjAyNS0wOS0yMCIsIkFVSCIsbnVsbCwiRVkiLCIyNDEiXSxbIkFVSCIsIjIwMjUtMDktMjEiLCJMSFIiLG51bGwsIkVZIiwiNjEiXV1d"
+    },
+    {
+      "flights": [
+        {
+          "departure_airport": {
+            "name": "Sardar Vallabhbhai Patel International Airport",
+            "id": "AMD",
+            "time": "2025-09-20 11:30"
+          },
+          "arrival_airport": {
+            "name": "Zayed International Airport",
+            "id": "AUH",
+            "time": "2025-09-20 13:00"
+          },
+          "duration": 180,
+          "airplane": "Airbus A320",
+          "airline": "Etihad",
+          "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/EY.png",
+          "travel_class": "Economy",
+          "flight_number": "EY 245",
+          "legroom": "32 in",
+          "extensions": [
+            "Above average legroom (32 in)",
+            "In-seat USB outlet",
+            "Stream media to your device",
+            "Carbon emissions estimate: 824 kg"
+          ]
+        },
+        {
+          "departure_airport": {
+            "name": "Zayed International Airport",
+            "id": "AUH",
+            "time": "2025-09-20 14:05"
+          },
+          "arrival_airport": {
+            "name": "Heathrow Airport",
+            "id": "LHR",
+            "time": "2025-09-20 18:45"
+          },
+          "duration": 460,
+          "airplane": "Airbus A380",
+          "airline": "Etihad",
+          "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/EY.png",
+          "travel_class": "Economy",
+          "flight_number": "EY 67",
+          "legroom": "31 in",
+          "extensions": [
+            "Average legroom (31 in)",
+            "Wi-Fi for a fee",
+            "In-seat power & USB outlets",
+            "On-demand video",
+            "Carbon emissions estimate: 1660 kg"
+          ]
+        }
+      ],
+      "layovers": [
+        {
+          "duration": 65,
+          "name": "Zayed International Airport",
+          "id": "AUH"
+        }
+      ],
+      "total_duration": 705,
+      "carbon_emissions": {
+        "this_flight": 2485000,
+        "typical_for_this_route": 2211000,
+        "difference_percent": 12
+      },
+      "price": 402096,
+      "type": "Round trip",
+      "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/EY.png",
+      "departure_token": "WyJDalJJUXpkM1FuazJla1Z4YVRSQlIyMWxZM2RDUnkwdExTMHRMUzB0TFMxc2JXZDNOVUZCUVVGQlIycEllSEpqU1VFNE1qUkJFZ3BGV1RJME5YeEZXVFkzR2dzSXNNVVlFQUFhQTBsT1VqZ2NjT1hvR3c9PSIsW1siQU1EIiwiMjAyNS0wOS0yMCIsIkFVSCIsbnVsbCwiRVkiLCIyNDUiXSxbIkFVSCIsIjIwMjUtMDktMjAiLCJMSFIiLG51bGwsIkVZIiwiNjciXV1d"
+    },
+    {
+      "flights": [
+        {
+          "departure_airport": {
+            "name": "Sardar Vallabhbhai Patel International Airport",
+            "id": "AMD",
+            "time": "2025-09-20 00:50"
+          },
+          "arrival_airport": {
+            "name": "Chhatrapati Shivaji Maharaj International Airport Mumbai",
+            "id": "BOM",
+            "time": "2025-09-20 02:20"
+          },
+          "duration": 90,
+          "airplane": "Airbus A320neo",
+          "airline": "IndiGo",
+          "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/6E.png",
+          "travel_class": "Economy",
+          "flight_number": "6E 803",
+          "legroom": "28 in",
+          "extensions": [
+            "Below average legroom (28 in)",
+            "Carbon emissions estimate: 212 kg"
+          ],
+          "overnight": true
+        },
+        {
+          "departure_airport": {
+            "name": "Chhatrapati Shivaji Maharaj International Airport Mumbai",
+            "id": "BOM",
+            "time": "2025-09-20 05:30"
+          },
+          "arrival_airport": {
+            "name": "Amsterdam Airport Schiphol",
+            "id": "AMS",
+            "time": "2025-09-20 11:00"
+          },
+          "duration": 540,
+          "airplane": "Boeing 787",
+          "airline": "IndiGo",
+          "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/6E.png",
+          "travel_class": "Economy",
+          "flight_number": "6E 21",
+          "legroom": "31 in",
+          "extensions": [
+            "Average legroom (31 in)",
+            "In-seat power & USB outlets",
+            "On-demand video",
+            "Carbon emissions estimate: 1596 kg"
+          ],
+          "plane_and_crew_by": "Operated Under Lease From Norse"
+        },
+        {
+          "departure_airport": {
+            "name": "Amsterdam Airport Schiphol",
+            "id": "AMS",
+            "time": "2025-09-20 17:30"
+          },
+          "arrival_airport": {
+            "name": "Heathrow Airport",
+            "id": "LHR",
+            "time": "2025-09-20 17:50"
+          },
+          "duration": 80,
+          "airplane": "Embraer 195 E2",
+          "airline": "KLM",
+          "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/KL.png",
+          "travel_class": "Economy",
+          "flight_number": "KL 1013",
+          "ticket_also_sold_by": [
+            "IndiGo"
+          ],
+          "legroom": "29 in",
+          "extensions": [
+            "Below average legroom (29 in)",
+            "In-seat USB outlet",
+            "Carbon emissions estimate: 208 kg"
+          ],
+          "often_delayed_by_over_30_min": true
+        }
+      ],
+      "layovers": [
+        {
+          "duration": 190,
+          "name": "Chhatrapati Shivaji Maharaj International Airport Mumbai",
+          "id": "BOM",
+          "overnight": true
+        },
+        {
+          "duration": 390,
+          "name": "Amsterdam Airport Schiphol",
+          "id": "AMS"
+        }
+      ],
+      "total_duration": 1290,
+      "carbon_emissions": {
+        "this_flight": 2018000,
+        "typical_for_this_route": 2211000,
+        "difference_percent": -9
+      },
+      "price": 322732,
+      "type": "Round trip",
+      "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/multi.png",
+      "departure_token": "WyJDalJJUXpkM1FuazJla1Z4YVRSQlIyMWxZM2RDUnkwdExTMHRMUzB0TFMxc2JXZDNOVUZCUVVGQlIycEllSEpqU1VFNE1qUkJFaEUyUlRnd00zdzJSVEl4ZkV0TU1UQXhNeG9MQ0t6WkV4QUFHZ05KVGxJNEhIRDlxUlk9IixbWyJBTUQiLCIyMDI1LTA5LTIwIiwiQk9NIixudWxsLCI2RSIsIjgwMyJdLFsiQk9NIiwiMjAyNS0wOS0yMCIsIkFNUyIsbnVsbCwiNkUiLCIyMSJdLFsiQU1TIiwiMjAyNS0wOS0yMCIsIkxIUiIsbnVsbCwiS0wiLCIxMDEzIl1dXQ=="
+    },
+    {
+      "flights": [
+        {
+          "departure_airport": {
+            "name": "Sardar Vallabhbhai Patel International Airport",
+            "id": "AMD",
+            "time": "2025-09-20 23:45"
+          },
+          "arrival_airport": {
+            "name": "Chhatrapati Shivaji Maharaj International Airport Mumbai",
+            "id": "BOM",
+            "time": "2025-09-21 01:15"
+          },
+          "duration": 90,
+          "airplane": "Airbus A320neo",
+          "airline": "IndiGo",
+          "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/6E.png",
+          "travel_class": "Economy",
+          "flight_number": "6E 6351",
+          "legroom": "28 in",
+          "extensions": [
+            "Below average legroom (28 in)",
+            "Carbon emissions estimate: 212 kg"
+          ],
+          "often_delayed_by_over_30_min": true
+        },
+        {
+          "departure_airport": {
+            "name": "Chhatrapati Shivaji Maharaj International Airport Mumbai",
+            "id": "BOM",
+            "time": "2025-09-21 06:55"
+          },
+          "arrival_airport": {
+            "name": "Istanbul Airport",
+            "id": "IST",
+            "time": "2025-09-21 11:35"
+          },
+          "duration": 430,
+          "airplane": "Boeing 777",
+          "airline": "IndiGo",
+          "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/6E.png",
+          "travel_class": "Economy",
+          "flight_number": "6E 17",
+          "legroom": "30 in",
+          "extensions": [
+            "Average legroom (30 in)",
+            "In-seat USB outlet",
+            "Carbon emissions estimate: 1422 kg"
+          ],
+          "plane_and_crew_by": "Operated Under Lease From Thy"
+        },
+        {
+          "departure_airport": {
+            "name": "Istanbul Airport",
+            "id": "IST",
+            "time": "2025-09-21 18:45"
+          },
+          "arrival_airport": {
+            "name": "Heathrow Airport",
+            "id": "LHR",
+            "time": "2025-09-21 20:50"
+          },
+          "duration": 245,
+          "airplane": "Boeing 787",
+          "airline": "Turkish Airlines",
+          "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/TK.png",
+          "travel_class": "Economy",
+          "flight_number": "TK 1983",
+          "ticket_also_sold_by": [
+            "IndiGo"
+          ],
+          "legroom": "31 in",
+          "extensions": [
+            "Average legroom (31 in)",
+            "Wi-Fi for a fee",
+            "In-seat USB outlet",
+            "On-demand video",
+            "Carbon emissions estimate: 630 kg"
+          ]
+        }
+      ],
+      "layovers": [
+        {
+          "duration": 340,
+          "name": "Chhatrapati Shivaji Maharaj International Airport Mumbai",
+          "id": "BOM",
+          "overnight": true
+        },
+        {
+          "duration": 430,
+          "name": "Istanbul Airport",
+          "id": "IST"
+        }
+      ],
+      "total_duration": 1535,
+      "carbon_emissions": {
+        "this_flight": 2266000,
+        "typical_for_this_route": 2211000,
+        "difference_percent": 2
+      },
+      "price": 378824,
+      "type": "Round trip",
+      "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/multi.png",
+      "departure_token": "WyJDalJJUXpkM1FuazJla1Z4YVRSQlIyMWxZM2RDUnkwdExTMHRMUzB0TFMxc2JXZDNOVUZCUVVGQlIycEllSEpqU1VFNE1qUkJFaEkyUlRZek5URjhOa1V4TjN4VVN6RTVPRE1hQ3dqSWp4Y1FBQm9EU1U1U09CeHcycG9hIixbWyJBTUQiLCIyMDI1LTA5LTIwIiwiQk9NIixudWxsLCI2RSIsIjYzNTEiXSxbIkJPTSIsIjIwMjUtMDktMjEiLCJJU1QiLG51bGwsIjZFIiwiMTciXSxbIklTVCIsIjIwMjUtMDktMjEiLCJMSFIiLG51bGwsIlRLIiwiMTk4MyJdXV0="
+    },
+    {
+      "flights": [
+        {
+          "departure_airport": {
+            "name": "Sardar Vallabhbhai Patel International Airport",
+            "id": "AMD",
+            "time": "2025-09-20 05:25"
+          },
+          "arrival_airport": {
+            "name": "Zayed International Airport",
+            "id": "AUH",
+            "time": "2025-09-20 06:55"
+          },
+          "duration": 180,
+          "airplane": "Airbus A320",
+          "airline": "Etihad",
+          "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/EY.png",
+          "travel_class": "Economy",
+          "flight_number": "EY 247",
+          "legroom": "32 in",
+          "extensions": [
+            "Above average legroom (32 in)",
+            "In-seat USB outlet",
+            "Stream media to your device",
+            "Carbon emissions estimate: 824 kg"
+          ]
+        },
+        {
+          "departure_airport": {
+            "name": "Zayed International Airport",
+            "id": "AUH",
+            "time": "2025-09-20 08:05"
+          },
+          "arrival_airport": {
+            "name": "Heathrow Airport",
+            "id": "LHR",
+            "time": "2025-09-20 12:45"
+          },
+          "duration": 460,
+          "airplane": "Airbus A380",
+          "airline": "Etihad",
+          "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/EY.png",
+          "travel_class": "Economy",
+          "flight_number": "EY 63",
+          "legroom": "31 in",
+          "extensions": [
+            "Average legroom (31 in)",
+            "Wi-Fi for a fee",
+            "In-seat power & USB outlets",
+            "On-demand video",
+            "Carbon emissions estimate: 1660 kg"
+          ]
+        }
+      ],
+      "layovers": [
+        {
+          "duration": 70,
+          "name": "Zayed International Airport",
+          "id": "AUH"
+        }
+      ],
+      "total_duration": 710,
+      "carbon_emissions": {
+        "this_flight": 2485000,
+        "typical_for_this_route": 2211000,
+        "difference_percent": 12
+      },
+      "price": 507568,
+      "type": "Round trip",
+      "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/EY.png",
+      "departure_token": "WyJDalJJUXpkM1FuazJla1Z4YVRSQlIyMWxZM2RDUnkwdExTMHRMUzB0TFMxc2JXZDNOVUZCUVVGQlIycEllSEpqU1VFNE1qUkJFZ3BGV1RJME4zeEZXVFl6R2dzSXNQMGVFQUFhQTBsT1VqZ2NjT2VPSXc9PSIsW1siQU1EIiwiMjAyNS0wOS0yMCIsIkFVSCIsbnVsbCwiRVkiLCIyNDciXSxbIkFVSCIsIjIwMjUtMDktMjAiLCJMSFIiLG51bGwsIkVZIiwiNjMiXV1d"
+    },
+    {
+      "flights": [
+        {
+          "departure_airport": {
+            "name": "Sardar Vallabhbhai Patel International Airport",
+            "id": "AMD",
+            "time": "2025-09-20 04:30"
+          },
+          "arrival_airport": {
+            "name": "Chhatrapati Shivaji Maharaj International Airport Mumbai",
+            "id": "BOM",
+            "time": "2025-09-20 06:10"
+          },
+          "duration": 100,
+          "airplane": "Airbus A320",
+          "airline": "IndiGo",
+          "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/6E.png",
+          "travel_class": "Economy",
+          "flight_number": "6E 6285",
+          "ticket_also_sold_by": [
+            "British Airways"
+          ],
+          "legroom": "28 in",
+          "extensions": [
+            "Below average legroom (28 in)",
+            "Carbon emissions estimate: 212 kg"
+          ],
+          "overnight": true
+        },
+        {
+          "departure_airport": {
+            "name": "Chhatrapati Shivaji Maharaj International Airport Mumbai",
+            "id": "BOM",
+            "time": "2025-09-20 09:30"
+          },
+          "arrival_airport": {
+            "name": "Heathrow Airport",
+            "id": "LHR",
+            "time": "2025-09-20 14:55"
+          },
+          "duration": 595,
+          "airplane": "Boeing 787",
+          "airline": "British Airways",
+          "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/BA.png",
+          "travel_class": "Premium Economy",
+          "flight_number": "BA 134",
+          "extensions": [
+            "Extra reclining seat",
+            "In-seat power & USB outlets",
+            "On-demand video",
+            "Carbon emissions estimate: 2759 kg"
+          ]
+        }
+      ],
+      "layovers": [
+        {
+          "duration": 200,
+          "name": "Chhatrapati Shivaji Maharaj International Airport Mumbai",
+          "id": "BOM"
+        }
+      ],
+      "total_duration": 895,
+      "carbon_emissions": {
+        "this_flight": 2972000,
+        "typical_for_this_route": 2211000,
+        "difference_percent": 34
+      },
+      "price": 565926,
+      "type": "Round trip",
+      "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/multi.png",
+      "departure_token": "WyJDalJJUXpkM1FuazJla1Z4YVRSQlIyMWxZM2RDUnkwdExTMHRMUzB0TFMxc2JXZDNOVUZCUVVGQlIycEllSEpqU1VFNE1qUkJFZ3cyUlRZeU9EVjhRa0V4TXpRYUN3aW14U0lRQUJvRFNVNVNPQnh3ekpNbiIsW1siQU1EIiwiMjAyNS0wOS0yMCIsIkJPTSIsbnVsbCwiNkUiLCI2Mjg1Il0sWyJCT00iLCIyMDI1LTA5LTIwIiwiTEhSIixudWxsLCJCQSIsIjEzNCJdXV0="
+    },
+    {
+      "flights": [
+        {
+          "departure_airport": {
+            "name": "Sardar Vallabhbhai Patel International Airport",
+            "id": "AMD",
+            "time": "2025-09-20 07:55"
+          },
+          "arrival_airport": {
+            "name": "Chhatrapati Shivaji Maharaj International Airport Mumbai",
+            "id": "BOM",
+            "time": "2025-09-20 09:25"
+          },
+          "duration": 90,
+          "airplane": "Airbus A320",
+          "airline": "IndiGo",
+          "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/6E.png",
+          "travel_class": "Economy",
+          "flight_number": "6E 2046",
+          "ticket_also_sold_by": [
+            "British Airways"
+          ],
+          "legroom": "28 in",
+          "extensions": [
+            "Below average legroom (28 in)",
+            "Carbon emissions estimate: 212 kg"
+          ]
+        },
+        {
+          "departure_airport": {
+            "name": "Chhatrapati Shivaji Maharaj International Airport Mumbai",
+            "id": "BOM",
+            "time": "2025-09-20 13:05"
+          },
+          "arrival_airport": {
+            "name": "Heathrow Airport",
+            "id": "LHR",
+            "time": "2025-09-20 18:20"
+          },
+          "duration": 585,
+          "airplane": "Boeing 777",
+          "airline": "British Airways",
+          "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/BA.png",
+          "travel_class": "Premium Economy",
+          "flight_number": "BA 198",
+          "extensions": [
+            "Extra reclining seat",
+            "Wi-Fi for a fee",
+            "In-seat power & USB outlets",
+            "On-demand video",
+            "Carbon emissions estimate: 3076 kg"
+          ]
+        }
+      ],
+      "layovers": [
+        {
+          "duration": 220,
+          "name": "Chhatrapati Shivaji Maharaj International Airport Mumbai",
+          "id": "BOM"
+        }
+      ],
+      "total_duration": 895,
+      "carbon_emissions": {
+        "this_flight": 3289000,
+        "typical_for_this_route": 2211000,
+        "difference_percent": 49
+      },
+      "price": 565926,
+      "type": "Round trip",
+      "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/multi.png",
+      "departure_token": "WyJDalJJUXpkM1FuazJla1Z4YVRSQlIyMWxZM2RDUnkwdExTMHRMUzB0TFMxc2JXZDNOVUZCUVVGQlIycEllSEpqU1VFNE1qUkJFZ3cyUlRJd05EWjhRa0V4T1RnYUN3aW14U0lRQUJvRFNVNVNPQnh3ekpNbiIsW1siQU1EIiwiMjAyNS0wOS0yMCIsIkJPTSIsbnVsbCwiNkUiLCIyMDQ2Il0sWyJCT00iLCIyMDI1LTA5LTIwIiwiTEhSIixudWxsLCJCQSIsIjE5OCJdXV0="
+    },
+    {
+      "flights": [
+        {
+          "departure_airport": {
+            "name": "Sardar Vallabhbhai Patel International Airport",
+            "id": "AMD",
+            "time": "2025-09-20 09:45"
+          },
+          "arrival_airport": {
+            "name": "Dubai International Airport",
+            "id": "DXB",
+            "time": "2025-09-20 11:10"
+          },
+          "duration": 175,
+          "airplane": "Boeing 777",
+          "airline": "Emirates",
+          "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/EK.png",
+          "travel_class": "Business Class",
+          "flight_number": "EK 541",
+          "extensions": [
+            "Lie flat seat",
+            "Wi-Fi for a fee",
+            "In-seat power & USB outlets",
+            "On-demand video",
+            "Carbon emissions estimate: 2382 kg"
+          ]
+        },
+        {
+          "departure_airport": {
+            "name": "Dubai International Airport",
+            "id": "DXB",
+            "time": "2025-09-20 14:15"
+          },
+          "arrival_airport": {
+            "name": "Heathrow Airport",
+            "id": "LHR",
+            "time": "2025-09-20 18:40"
+          },
+          "duration": 445,
+          "airplane": "Airbus A380",
+          "airline": "Emirates",
+          "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/EK.png",
+          "travel_class": "Business Class",
+          "flight_number": "EK 3",
+          "extensions": [
+            "Lie flat seat",
+            "Wi-Fi for a fee",
+            "In-seat power & USB outlets",
+            "On-demand video",
+            "Carbon emissions estimate: 6144 kg"
+          ],
+          "often_delayed_by_over_30_min": true
+        }
+      ],
+      "layovers": [
+        {
+          "duration": 185,
+          "name": "Dubai International Airport",
+          "id": "DXB"
+        }
+      ],
+      "total_duration": 805,
+      "carbon_emissions": {
+        "this_flight": 8527000,
+        "typical_for_this_route": 2211000,
+        "difference_percent": 286
+      },
+      "price": 902620,
+      "type": "Round trip",
+      "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/EK.png",
+      "departure_token": "WyJDalJJUXpkM1FuazJla1Z4YVRSQlIyMWxZM2RDUnkwdExTMHRMUzB0TFMxc2JXZDNOVUZCUVVGQlIycEllSEpqU1VFNE1qUkJFZ2xGU3pVME1YeEZTek1hQ3dqY2l6Y1FBQm9EU1U1U09CeHdtN2srIixbWyJBTUQiLCIyMDI1LTA5LTIwIiwiRFhCIixudWxsLCJFSyIsIjU0MSJdLFsiRFhCIiwiMjAyNS0wOS0yMCIsIkxIUiIsbnVsbCwiRUsiLCIzIl1dXQ=="
+    }
+  ]
+}

@@ -93,9 +93,10 @@ class TravelAgent:
             return history + [{"role": "assistant", "content": f"System error: {str(e)}"}], {"error": str(e)}
         
         user = {"role": "user", "content": message}
+        history = history + [user]
         ai_msg = result["messages"][-1]
         reply = {"role": "assistant", "content": ai_msg.content}
-        history = history + [user, reply]
+        history = history + [reply]
 
         flight_data, original_params = self._extract_flight_data_and_params(result["messages"])
         if self._has_available_flights(flight_data):

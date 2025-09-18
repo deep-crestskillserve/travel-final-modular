@@ -9,3 +9,10 @@ wheels/
 # Virtual environments
 .venv
 .env
+
+# temp
+test-ui
+a.txt
+b.txt
+*.wav
+travel-git-final-modular.zip

@@ -2,6 +2,7 @@ import gradio as gr
 from frontend.utils import book_flight
 from frontend.components.ui_manager import UIManager
 from backend.agents.travel_agent import TravelAgent
+from backend.transcript.main import AssemblyAITranscriber
 
 MAX_FLIGHTS = 20
 MAX_BOOKING_OPTIONS = 10
@@ -34,7 +35,7 @@ CSS = """
     border-radius: 8px !important;
     border: 1px solid var(--flight-border) !important;
     padding: 0 !important;
-    max-height: 600px !important;
+    max-height: 500px !important;
     min-height: 0 !important;
     overflow: hidden !important;
     box-shadow: var(--flight-shadow) !important;
@@ -71,6 +72,7 @@ CSS = """
     position: relative !important;
     overflow: visible !important;
     max-height: none !important;
+    text-align: center;
 }
 
 .card-container:hover {
@@ -84,6 +86,37 @@ CSS = """
     border-color: var(--flight-accent) !important;
     background: var(--flight-surface-hover) !important;
     box-shadow: var(--flight-shadow) !important;
+}
+
+.logo-chain {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.route {
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--flight-text) !important;
+    margin-bottom: 4px;
+}
+
+.price {
+    font-weight: 700;
+    color: var(--flight-accent) !important;
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+.duration {
+    font-size: 14px;
+    color: var(--flight-text-secondary) !important;
+    margin-bottom: 4px;
+}
+.stops {
+    font-size: 14px;
+    color: var(--flight-text-secondary) !important;
 }
 
 /* Click overlay for cards */
@@ -180,8 +213,8 @@ CSS = """
     padding: 2rem !important;
     text-align: center !important;
     color: var(--flight-text) !important;
-    overflow: visible !important; /* Ensure no scrolling */
-    max-height: none !important; /* Allow full height */
+    overflow: visible !important;
+    max-height: none !important;
 }
 
 .loader {
@@ -212,8 +245,8 @@ CSS = """
     padding: 1rem !important;
     color: var(--flight-error) !important;
     margin-bottom: 1rem !important;
-    overflow: visible !important; /* Ensure no scrolling */
-    max-height: none !important; /* Allow full height */
+    overflow: visible !important;
+    max-height: none !important;
 }
 
 /* Card grid styling */
@@ -255,10 +288,12 @@ CSS = """
     background: #6b7280 !important;
 }
 
+
+
 /* Responsive design */
 @media (max-width: 768px) {
     #flight-container {
-        height: auto !important; /* Allow height to grow on mobile to avoid squishing */
+        height: auto !important;
         max-height: 80vh !important;
     }
 
@@ -272,7 +307,7 @@ CSS = """
     }
     
     .card-container {
-        max-height: none !important; /* Allow full card visibility on mobile */
+        max-height: none !important;
     }
 
     #confirm-button, .primary-btn, .secondary-btn {
@@ -286,7 +321,16 @@ def create_travel_app():
     """ Create the Gradio travel app with all components and interactions """
 
     travel_agent = TravelAgent()
+    transcriber = AssemblyAITranscriber()
 
+    def toggle_transcription(is_recording, current_message):
+        if is_recording:
+            transcriber.stop()
+            transcript = transcriber.get_transcript()
+            return False, transcript, gr.update(value="🎤")
+        else:
+            transcriber.start()
+            return True, "", gr.update(value="🔴")
     def create_booking_handler(option_index):
         """ Create booking handler for specific option """
 
@@ -333,6 +377,7 @@ def create_travel_app():
             "",  # message
             [],  # chatbot
             new_thread_id,  # thread_id_state
+            False, # is_recording
             
             # State variables
             VIEW_OUTBOUND_CARDS,  # current_view
@@ -385,10 +430,11 @@ def create_travel_app():
         return_flights_state = gr.State(value={})
         selected_return_index = gr.State(value=None)
         booking_data_state = gr.State(value={})
+        is_recording = gr.State(False)
         
         with gr.Row():
             with gr.Column():
-                chatbot = gr.Chatbot(label="Travel Chatbot", height=600, type="messages", elem_classes=["chatbot"])
+                chatbot = gr.Chatbot(label="Travel Chatbot", height=500, type="messages", elem_classes=["chatbot"])
             
             with gr.Column(visible=False, scale=1) as flight_section:
                 with gr.Group():                    
@@ -424,7 +470,7 @@ def create_travel_app():
                             with gr.Column(elem_classes=["flight-buttons"]):
                                 outbound_view_flight_button = gr.Button("View Flight", interactive=False, elem_id="confirm-button") 
                         
-                        with gr.Column(visible = False, elem_classes=["flight-view"]) as outbound_flight_details:
+                        with gr.Column(visible=False, elem_classes=["flight-view"]) as outbound_flight_details:
                             with gr.Column(elem_classes=["flight-content"]):
                                 with gr.Column(elem_classes=["flight-details"]):
                                     outbound_flight_details_box = gr.Markdown()
@@ -500,10 +546,19 @@ def create_travel_app():
 
         with gr.Group():
             with gr.Row():
-                message = gr.Textbox(show_label=False, placeholder="Enter your travel query")
+                message = gr.Textbox(show_label=False, placeholder="Enter your travel query", scale=4)
+                mic_button = gr.Button("🎤", scale=1, min_width=80)
+
         with gr.Row():
             reset_button = gr.Button("Reset", variant="stop")
             go_button = gr.Button("Go!", variant="primary")
+        
+        mic_button.click(
+            fn=toggle_transcription,
+            inputs=[is_recording, message],
+            outputs=[is_recording, message, mic_button]
+        )
+
 
         # (0) user clicks on "go" button or "enter" inside the textbox -> message is processed and flight cards are shown if available
         message.submit(
@@ -528,6 +583,9 @@ def create_travel_app():
         ).then(
             fn=lambda: (gr.update(visible=False), gr.update(value="")),
             outputs=[loader_group, loader_message]
+        ).then(
+            fn=lambda: gr.update(value=""),
+            outputs=message
         )
 
         go_button.click(
@@ -552,6 +610,9 @@ def create_travel_app():
         ).then(
             fn=lambda: (gr.update(visible=False), gr.update(value="")),
             outputs=[loader_group, loader_message]
+        ).then(
+            fn=lambda: gr.update(value=""),
+            outputs=message
         )
         
         # (1) User clicks on the outbound flights cards -> view flight button becomes interactive
@@ -709,7 +770,7 @@ def create_travel_app():
             fn=complete_reset,
             outputs=[
                 # Basic inputs/outputs
-                message, chatbot, thread_id_state,
+                message, chatbot, thread_id_state, is_recording,
 
                 # State variables
                 current_view, initial_flight_payload, outbound_flights_state,

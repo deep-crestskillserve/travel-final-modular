@@ -2,12 +2,13 @@ import os
 import json
 
 # Base directory where JSON files are stored
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "flight_responses"))
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+FLIGHT_RESPONSES_DIR = os.path.join(BASE_DIR, "flight_responses")
 
 def load_json_data(filename: str) -> dict:
     """ Load JSON data from a file in the flight_responses folder. """
     
-    filepath = os.path.join(BASE_DIR, filename)
+    filepath = os.path.join(FLIGHT_RESPONSES_DIR, filename)
     try:
         with open(filepath, "r") as file:
             return json.load(file)

@@ -1,0 +1,128 @@
+{
+  "search_metadata": {
+    "id": "68c7c34127c2b04b2c53988b",
+    "status": "Success",
+    "json_endpoint": "https://serpapi.com/searches/54b6f836da125df7/68c7c34127c2b04b2c53988b.json",
+    "created_at": "2025-09-15 07:41:53 UTC",
+    "processed_at": "2025-09-15 07:41:53 UTC",
+    "google_flights_url": "https://www.google.com/travel/flights?hl=en&gl=in&curr=INR&tfs=CBwQAho_EgoyMDI1LTA5LTIwIh8KA0FNRBIKMjAyNS0wOS0yMBoDTEhSKgJBSTIDMTM1agcIARIDQU1EcgcIARIDTEhSGh4SCjIwMjUtMDktMjVqBwgBEgNMSFJyBwgBEgNBTURCBAEBAgJIAXABmAEB&tfu=EgIIAQ",
+    "raw_html_file": "https://serpapi.com/searches/54b6f836da125df7/68c7c34127c2b04b2c53988b.html",
+    "prettify_html_file": "https://serpapi.com/searches/54b6f836da125df7/68c7c34127c2b04b2c53988b.prettify",
+    "total_time_taken": 2.24
+  },
+  "search_parameters": {
+    "engine": "google_flights",
+    "hl": "en",
+    "gl": "in",
+    "type": "1",
+    "departure_id": "AMD",
+    "arrival_id": "LHR",
+    "outbound_date": "2025-09-20",
+    "return_date": "2025-09-25",
+    "adults": 2,
+    "children": 2,
+    "departure_token": "WyJDalJJVjBkeE1HOUtlWGhHTm5kQlJVdFhhM2RDUnkwdExTMHRMUzB0TFMxdmEyaG5NMEZCUVVGQlIycEljekJWU0hCVmNHOUJFZ1ZCU1RFek5Sb0xDUHo2RkJBQUdnTkpUbEk0SEhDUzRCYz0iLFtbIkFNRCIsIjIwMjUtMDktMjAiLCJMSFIiLG51bGwsIkFJIiwiMTM1Il1dXQ==",
+    "currency": "INR"
+  },
+  "airports": [
+    {
+      "departure": [
+        {
+          "airport": {
+            "id": "AMD",
+            "name": "Sardar Vallabhbhai Patel International Airport"
+          },
+          "city": "Ahmedabad",
+          "country": "India",
+          "country_code": "IN",
+          "image": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRjpYKurWt2tPUXzl_C9sbJFY_9RfBpZ2GkMR6mQI05W-ZA_4vy1r5Lkt15MLx17YBGL6p8ryYdBbE-2Q",
+          "thumbnail": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQJEraVmaiQLSM_-c08TG-ZDfVb9mt-T21q6paXLUoRduQU2bEBE_l8ccQfdvxo4K12HKC7mJVgm20Q9qezldquyV1DvHr_Tr4TpzRIGRA"
+        }
+      ],
+      "arrival": [
+        {
+          "airport": {
+            "id": "LHR",
+            "name": "Heathrow Airport"
+          },
+          "city": "London",
+          "country": "United Kingdom",
+          "country_code": "GB",
+          "image": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRpN9RbtOSTDqKIPxWc_D6rdSysaWVh6d-NW7yz7yFXKRwh5RN5BpNIoXEwH1XVcFdLWqn6Sm8_Y_zmeg",
+          "thumbnail": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQYH83YXny8hR4M7k5BMFq4vUT6LNtVABQzgs2pg-hcpSZq3oMBOQK3xh591AAJv2Qx4uvFZUGqOVt4kuoCUOklISunmndJleOoSef_7QE"
+        }
+      ]
+    },
+    {
+      "departure": [
+        {
+          "airport": {
+            "id": "LHR",
+            "name": "Heathrow Airport"
+          },
+          "city": "London",
+          "country": "United Kingdom",
+          "country_code": "GB",
+          "image": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRpN9RbtOSTDqKIPxWc_D6rdSysaWVh6d-NW7yz7yFXKRwh5RN5BpNIoXEwH1XVcFdLWqn6Sm8_Y_zmeg",
+          "thumbnail": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQYH83YXny8hR4M7k5BMFq4vUT6LNtVABQzgs2pg-hcpSZq3oMBOQK3xh591AAJv2Qx4uvFZUGqOVt4kuoCUOklISunmndJleOoSef_7QE"
+        }
+      ],
+      "arrival": [
+        {
+          "airport": {
+            "id": "AMD",
+            "name": "Sardar Vallabhbhai Patel International Airport"
+          },
+          "city": "Ahmedabad",
+          "country": "India",
+          "country_code": "IN",
+          "image": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRjpYKurWt2tPUXzl_C9sbJFY_9RfBpZ2GkMR6mQI05W-ZA_4vy1r5Lkt15MLx17YBGL6p8ryYdBbE-2Q",
+          "thumbnail": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQJEraVmaiQLSM_-c08TG-ZDfVb9mt-T21q6paXLUoRduQU2bEBE_l8ccQfdvxo4K12HKC7mJVgm20Q9qezldquyV1DvHr_Tr4TpzRIGRA"
+        }
+      ]
+    }
+  ],
+  "flights": [
+    {
+      "flights": [
+        {
+          "departure_airport": {
+            "name": "Heathrow Airport",
+            "id": "LHR",
+            "time": "2025-09-25 22:10"
+          },
+          "arrival_airport": {
+            "name": "Sardar Vallabhbhai Patel International Airport",
+            "id": "AMD",
+            "time": "2025-09-26 11:25"
+          },
+          "duration": 525,
+          "airplane": "Boeing 787",
+          "airline": "Air India",
+          "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AI.png",
+          "travel_class": "Economy",
+          "flight_number": "AI 134",
+          "legroom": "33 in",
+          "extensions": [
+            "Above average legroom (33 in)",
+            "In-seat power & USB outlets",
+            "Stream media to your device",
+            "Carbon emissions estimate: 1848 kg"
+          ],
+          "overnight": true,
+          "often_delayed_by_over_30_min": true
+        }
+      ],
+      "total_duration": 525,
+      "carbon_emissions": {
+        "this_flight": 1848000,
+        "typical_for_this_route": 2128000,
+        "difference_percent": -13
+      },
+      "price": 369670,
+      "type": "Round trip",
+      "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AI.png",
+      "booking_token": "WyJDalJJTkdORmRIWkJkVXBGVDNOQlNtc3hPVkZDUnkwdExTMHRMUzB0Y0daaVkyMHlNa0ZCUVVGQlIycElkekJKUTJOR1gxbEJFZ1ZCU1RFek5Cb0xDSWJJRmhBQUdnTkpUbEk0SEhEU3lSaz0iLFtbIkFNRCIsIjIwMjUtMDktMjAiLCJMSFIiLG51bGwsIkFJIiwiMTM1Il1dLFtbIkxIUiIsIjIwMjUtMDktMjUiLCJBTUQiLG51bGwsIkFJIiwiMTM0Il1dXQ=="
+    }
+  ]
+}
