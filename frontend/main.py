@@ -288,6 +288,31 @@ CSS = """
     background: #6b7280 !important;
 }
 
+#booking-content {
+    max-height: 400px !important;
+    overflow-y: auto !important;
+    padding: 1rem !important;
+}
+
+/* Scrollbar styling for booking options */
+#booking-content::-webkit-scrollbar {
+    width: 12px !important;
+}
+
+#booking-content::-webkit-scrollbar-track {
+    background: var(--flight-bg) !important;
+    border-radius: 6px !important;
+}
+
+#booking-content::-webkit-scrollbar-thumb {
+    background: var(--flight-border) !important;
+    border-radius: 6px !important;
+    border: 2px solid var(--flight-bg) !important;
+}
+
+#booking-content::-webkit-scrollbar-thumb:hover {
+    background: #6b7280 !important;
+}
 
 
 /* Responsive design */
@@ -313,6 +338,10 @@ CSS = """
     #confirm-button, .primary-btn, .secondary-btn {
         min-width: 100px !important;
         padding: 0.5rem 1rem !important;
+    }
+    
+    #booking-content {
+        max-height: 300px !important;
     }
 }
 """
@@ -518,36 +547,37 @@ def create_travel_app():
                                     return_booking_options_button = gr.Button("Finalise Flight", elem_classes=["primary-btn"])
                         
                         with gr.Column(visible=False, elem_classes=["flight-view"]) as flight_booking_section:
-                            with gr.Column(elem_classes=["flight-content"]):
-                                gr.Markdown("# Flight Booking Options")
-                                gr.Markdown("Select a booking option to proceed to the booking partner's website.")
-                            
-                                booking_groups = []
-                                info_mds = []
-                                booking_buttons = []
-                                booking_results = []
-                            
-                                for i in range(MAX_BOOKING_OPTIONS):
-                                    with gr.Group(visible=False) as group:
-                                        info_md = gr.Markdown("")
-                                        btn = gr.Button("Book", elem_classes=["primary-btn"])
-                                        result = gr.Markdown(label=f"Booking Result {i+1}")
-                                    
-                                        info_mds.append(info_md)
-                                        booking_buttons.append(btn)
-                                        booking_results.append(result)
-                                    
-                                        btn.click(
-                                            fn=create_booking_handler(i),
-                                            inputs=booking_data_state,
-                                            outputs=booking_results[i]
-                                        )
-                                    booking_groups.append(group)
+                            with gr.Column(elem_id="booking-content"):
+                                with gr.Column(elem_classes=["flight-content"]):
+                                    gr.Markdown("# Flight Booking Options")
+                                    gr.Markdown("Select a booking option to proceed to the booking partner's website.")
+                                
+                                    booking_groups = []
+                                    info_mds = []
+                                    booking_buttons = []
+                                    booking_results = []
+                                
+                                    for i in range(MAX_BOOKING_OPTIONS):
+                                        with gr.Group(visible=False) as group:
+                                            info_md = gr.Markdown("")
+                                            btn = gr.Button("Book", elem_classes=["primary-btn"])
+                                            result = gr.Markdown(label=f"Booking Result {i+1}")
+                                        
+                                            info_mds.append(info_md)
+                                            booking_buttons.append(btn)
+                                            booking_results.append(result)
+                                        
+                                            btn.click(
+                                                fn=create_booking_handler(i),
+                                                inputs=booking_data_state,
+                                                outputs=booking_results[i]
+                                            )
+                                        booking_groups.append(group)
 
         with gr.Group():
             with gr.Row():
-                message = gr.Textbox(show_label=False, placeholder="Enter your travel query", scale=4)
-                mic_button = gr.Button("🎤", scale=1, min_width=80)
+                message = gr.Textbox(show_label=False, placeholder="Enter your travel query", scale=5)
+                mic_button = gr.Button("🎤", scale=0.5, min_width=80)
 
         with gr.Row():
             reset_button = gr.Button("Reset", variant="stop")

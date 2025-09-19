@@ -12,7 +12,6 @@ wheels/
 
 # temp
 test-ui
-a.txt
-b.txt
+*.txt
 *.wav
-travel-git-final-modular.zip
+*.zip

@@ -7,10 +7,10 @@ import wave
 from urllib.parse import urlencode
 from datetime import datetime
 from dotenv import load_dotenv
-load_dotenv()
 import os
 from queue import Queue
 
+load_dotenv()
 YOUR_API_KEY = os.getenv("ASSEMBLYAI_API_KEY")
 
 CONNECTION_PARAMS = {
