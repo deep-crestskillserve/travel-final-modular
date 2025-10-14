@@ -4,6 +4,7 @@ from frontend.components.ui_manager import UIManager
 from backend.agents.travel_agent import TravelAgent
 from backend.transcript.main import AssemblyAITranscriber
 import asyncio  # NEW: Import asyncio for handling async init
+import re
 
 MAX_FLIGHTS = 20
 MAX_BOOKING_OPTIONS = 10
@@ -117,6 +118,11 @@ CSS = """
 .stops {
     font-size: 14px;
     color: var(--flight-text-secondary) !important;
+}
+.departure-time {
+    font-size: 14px;
+    color: var(--flight-text-secondary) !important;
+    margin-bottom: 4px;
 }
 
 /* Click overlay for cards */
@@ -271,62 +277,34 @@ CSS = """
     flex-wrap: wrap !important;
 }
 
-/* Scrollbar styling for dark theme */
-.flight-content::-webkit-scrollbar {
-    width: 12px !important;
-}
-
-.flight-content::-webkit-scrollbar-track {
-    background: var(--flight-bg) !important;
-    border-radius: 6px !important;
-}
-
-.flight-content::-webkit-scrollbar-thumb {
-    background: var(--flight-border) !important;
-    border-radius: 6px !important;
-    border: 2px solid var(--flight-bg) !important;
-}
-
-.flight-content::-webkit-scrollbar-thumb:hover {
-    background: #6b7280 !important;
-}
-
-/* Scrollbar for .cards-grid (unchanged - matches booking) */
-.cards-grid::-webkit-scrollbar {
-    width: 12px !important;
-}
-
-.cards-grid::-webkit-scrollbar-track {
-    background: var(--flight-bg) !important;
-    border-radius: 6px !important;
-}
-
-.cards-grid::-webkit-scrollbar-thumb {
-    background: var(--flight-border) !important;
-    border-radius: 6px !important;
-    border: 2px solid var(--flight-bg) !important;
-}
-
-.cards-grid::-webkit-scrollbar-thumb:hover {
-    background: #6b7280 !important;
-}
-
-/* Scrollbar for .flight-details - UPDATED: Reinforced specificity with !important */
+/* Unified scrollbar styling for flight-content, cards-grid, booking-content, and flight-details */
+.flight-content::-webkit-scrollbar,
+.cards-grid::-webkit-scrollbar,
+#booking-content::-webkit-scrollbar,
 .flight-details::-webkit-scrollbar {
     width: 12px !important;
 }
 
+.flight-content::-webkit-scrollbar-track,
+.cards-grid::-webkit-scrollbar-track,
+#booking-content::-webkit-scrollbar-track,
 .flight-details::-webkit-scrollbar-track {
     background: var(--flight-bg) !important;
     border-radius: 6px !important;
 }
 
+.flight-content::-webkit-scrollbar-thumb,
+.cards-grid::-webkit-scrollbar-thumb,
+#booking-content::-webkit-scrollbar-thumb,
 .flight-details::-webkit-scrollbar-thumb {
     background: var(--flight-border) !important;
     border-radius: 6px !important;
     border: 2px solid var(--flight-bg) !important;
 }
 
+.flight-content::-webkit-scrollbar-thumb:hover,
+.cards-grid::-webkit-scrollbar-thumb:hover,
+#booking-content::-webkit-scrollbar-thumb:hover,
 .flight-details::-webkit-scrollbar-thumb:hover {
     background: #6b7280 !important;
 }
@@ -336,26 +314,6 @@ CSS = """
     min-height: calc(500px - 40px) !important; /* Slight adjustment since no buttons */
     overflow-y: auto !important;
     padding: 1rem !important;
-}
-
-/* Scrollbar styling for booking options (unchanged - reference) */
-#booking-content::-webkit-scrollbar {
-    width: 12px !important;
-}
-
-#booking-content::-webkit-scrollbar-track {
-    background: var(--flight-bg) !important;
-    border-radius: 6px !important;
-}
-
-#booking-content::-webkit-scrollbar-thumb {
-    background: var(--flight-border) !important;
-    border-radius: 6px !important;
-    border: 2px solid var(--flight-bg) !important;
-}
-
-#booking-content::-webkit-scrollbar-thumb:hover {
-    background: #6b7280 !important;
 }
 
 /* Booking options styling */
@@ -451,8 +409,15 @@ def create_travel_app():
             booking_options = booking_data.get("booking_options", []) if booking_data else []
             if option_index < len(booking_options):
                 post_data = booking_options[option_index].get("together", {}).get("booking_request", {}).get("post_data", "")
-                return book_flight(post_data)
-            return "⚠️ Invalid option"
+                result = book_flight(post_data)
+                if result.startswith("[Click here to complete booking]"):
+                    # NEW: Extract URL and enable redirect button
+                    url_match = re.search(r"\[(.*?)\]\((.*?)\)", result)
+                    if url_match:
+                        url = url_match.group(2)
+                        return "Booking request processed successfully!", gr.update(interactive=True, value="Book Now", _js=f"window.location.href='{url}'")
+                return result, gr.update(interactive=False)
+            return "⚠️ Invalid option", gr.update(interactive=False)
         return handle_booking
 
     def update_button_visibility(params):
@@ -483,6 +448,7 @@ def create_travel_app():
         hidden_booking_groups = [gr.update(visible=False)] * MAX_BOOKING_OPTIONS
         empty_info_updates = [""] * MAX_BOOKING_OPTIONS
         hidden_booking_buttons = [gr.update(visible=False)] * MAX_BOOKING_OPTIONS
+        hidden_redirect_buttons = [gr.update(visible=False)] * MAX_BOOKING_OPTIONS  # NEW: Reset redirect buttons
         empty_booking_results = [""] * MAX_BOOKING_OPTIONS
         
         return (
@@ -526,6 +492,7 @@ def create_travel_app():
             *hidden_booking_groups,  # booking_groups visibility
             *empty_info_updates,  # info_mds content
             *hidden_booking_buttons,  # booking_buttons visibility
+            *hidden_redirect_buttons,  # NEW: redirect_buttons visibility
             *empty_booking_results,  # booking_results content
             gr.update(visible=False),  # loader_group
             gr.update(value=""),  # loader_message
@@ -548,7 +515,7 @@ def create_travel_app():
         
         with gr.Row():
             with gr.Column():
-                chatbot = gr.Chatbot(label="Travel Chatbot", height=500, type="messages", elem_classes=["chatbot"])
+                chatbot = gr.Chatbot(label="Travel Chatbot", height=500, type="messages")
             
             with gr.Column(visible=False, scale=1) as flight_section:
                 with gr.Group():                    
@@ -640,22 +607,28 @@ def create_travel_app():
                                     booking_groups = []
                                     info_mds = []
                                     booking_buttons = []
+                                    redirect_buttons = []  # NEW: List to store redirect buttons
                                     booking_results = []
                                 
                                     for i in range(MAX_BOOKING_OPTIONS):
                                         with gr.Group(visible=False, elem_classes=["booking-option"]) as group:
                                             info_md = gr.Markdown("")
-                                            btn = gr.Button("Book", elem_classes=["primary-btn"])
+                                            # NEW: Row for Book and Book Now buttons
+                                            with gr.Row(elem_classes=["button-row"]):
+                                                btn = gr.Button("Book", elem_classes=["primary-btn"])
+                                                redirect_btn = gr.Button("Book Now", elem_classes=["primary-btn"], interactive=False)
                                             result = gr.Markdown(label=f"Booking Result {i+1}", show_label=False)
                                         
                                             info_mds.append(info_md)
                                             booking_buttons.append(btn)
+                                            redirect_buttons.append(redirect_btn)  # NEW: Add redirect button
                                             booking_results.append(result)
                                         
+                                            # NEW: Update outputs to include redirect button
                                             btn.click(
                                                 fn=create_booking_handler(i),
                                                 inputs=booking_data_state,
-                                                outputs=booking_results[i]
+                                                outputs=[booking_results[i], redirect_buttons[i]]
                                             )
                                         booking_groups.append(group)
 
@@ -673,7 +646,7 @@ def create_travel_app():
             inputs=[is_recording, message],
             outputs=[is_recording, message, mic_button]
         )
-
+        
 
         # (0) user clicks on "go" button or "enter" inside the textbox -> message is processed and flight cards are shown if available
         message.submit(
@@ -779,9 +752,10 @@ def create_travel_app():
             inputs=current_view,
             outputs=[outbound_flight_cards, return_flight_cards, outbound_flight_details, return_flight_details, flight_booking_section]
         ).then(
+            # NEW: Include redirect_buttons in outputs
             fn=UIManager.update_booking_ui,
             inputs=booking_data_state,
-            outputs=booking_groups + info_mds + [b for b in booking_buttons]
+            outputs=booking_groups + info_mds + booking_buttons + redirect_buttons
         ).then(
             fn=lambda: (gr.update(visible=False), gr.update(value="")),
             outputs=[loader_group, loader_message]
@@ -872,9 +846,10 @@ def create_travel_app():
             inputs=current_view,
             outputs=[outbound_flight_cards, return_flight_cards, outbound_flight_details, return_flight_details, flight_booking_section]
         ).then(
+            # NEW: Include redirect_buttons in outputs
             fn=UIManager.update_booking_ui,
             inputs=booking_data_state,
-            outputs=booking_groups + info_mds + [b for b in booking_buttons]
+            outputs=booking_groups + info_mds + booking_buttons + redirect_buttons
         ).then(
             fn=lambda: (gr.update(visible=False), gr.update(value="")),
             outputs=[loader_group, loader_message]
@@ -907,7 +882,7 @@ def create_travel_app():
                 return_flight_details_box,
                 
                 # Booking section
-                *booking_groups, *info_mds, *booking_buttons, *booking_results,
+                *booking_groups, *info_mds, *booking_buttons, *redirect_buttons, *booking_results,  # NEW: Added redirect_buttons
                 loader_group, loader_message, error_message
             ]
         ).then(  # Chain to sync inner view visibilities after reset

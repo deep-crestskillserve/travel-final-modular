@@ -32,6 +32,7 @@ class UIManager:
             for f in flight.get("flights", [])
         )
         selected_class = "selected" if selected else ""
+        departure_time = first.get('departure_airport', {}).get('time', 'N/A')
         return f"""
         <div class="card card-container {selected_class}" id="card-{idx}">
             <div class="logo-chain">{logos}</div>
@@ -39,6 +40,7 @@ class UIManager:
             <div class="price">₹{flight.get('price', 'N/A')}</div>
             <div class="duration">{format_duration(flight.get('total_duration'))} total</div>
             <div class="stops">{stops_text}</div>
+            <div class="departure-time">Departs: {departure_time}</div>
         </div>
         """
 
@@ -93,32 +95,27 @@ class UIManager:
         logger.info(f"Loading booking options...")
         
         booking_options = booking_data.get("booking_options", []) if booking_data else []
-        group_visibles = []
-        info_updates = []
-        button_values = []
+        booking_groups_updates = []
+        info_md_updates = []
+        booking_button_updates = []
+        redirect_button_updates = []
         for i in range(MAX_BOOKING_OPTIONS):
             if i < len(booking_options):
-                option = booking_options[i].get("together", {})
-                book_with = option.get("book_with", "Unknown")
-                price = option.get("price", "N/A")
-                currency = booking_data.get("search_parameters", {}).get("currency", "INR") if booking_data else "INR"
-                flight_numbers = ', '.join(option.get("marketed_as", []))
-                baggage = ', '.join(option.get("baggage_prices", []))
-                info = (
-                    f"### Option {i+1}: {book_with}<br>"
-                    f"Price: {price} {currency}<br>"
-                    f"Flights: {flight_numbers}<br>"
-                    f"Baggage: {baggage}"
-                )
-                group_visibles.append(gr.update(visible=True))
-                info_updates.append(info)
-                button_values.append(gr.update(value=f"Book with {book_with}", visible=True))
+                option = booking_options[i]
+                together_data = option.get("together", {})
+                price = together_data.get("price", "N/A")
+                provider = together_data.get("provider", "Unknown")
+                booking_groups_updates.append(gr.update(visible=True))
+                info_md_updates.append(f"**Option {i+1}: {provider}** - Price: ₹{price}")
+                booking_button_updates.append(gr.update(visible=True))
+                redirect_button_updates.append(gr.update(interactive=False))
             else:
-                group_visibles.append(gr.update(visible=False))
-                info_updates.append("")
-                button_values.append(gr.update(visible=False))
-        return group_visibles + info_updates + button_values
-
+                booking_groups_updates.append(gr.update(visible=False))
+                info_md_updates.append("")
+                booking_button_updates.append(gr.update(visible=False))
+                redirect_button_updates.append(gr.update(interactive=False))
+        return booking_groups_updates + info_md_updates + booking_button_updates + redirect_button_updates
+    
     @staticmethod
     def get_flight_details(selected: int, flight_data: Dict, params: Dict):
         """ Get flight details view based on selected flight and trip type """
@@ -134,8 +131,6 @@ class UIManager:
         else:
             # One-way: Always outbound
             next_view = VIEW_OUTBOUND_DETAILS
-
-
         
         if selected < 0 or selected >= len(flights):
             if next_view == VIEW_OUTBOUND_DETAILS:
