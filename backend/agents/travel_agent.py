@@ -12,7 +12,7 @@ from langgraph.graph.message import add_messages
 from langgraph.graph import END, StateGraph, START
 from langgraph.checkpoint.memory import MemorySaver
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
+from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '..')))
 from backend.tools.airports import get_airport
 from backend.tools.flights import get_flights
@@ -33,14 +33,14 @@ class TravelAgent:
 
     def __init__(self):
         system_message = f"""
-            you are a smart travel agency, use the tool to lookup information.
+            you are a smart travel agency agent, use the tool to lookup information.
+            Do not ask multiple questions at once.
+            You may look up information before asking a follow-up question if required.
             only lookup information when you are sure you want that.
-            Do not ask multiple question at a time.
-            If you need to look up some information before asking a follow up question, you are allowed to do that!
-            once you get the information about nearby relevant airports for outbound and inbound locations, list top 5 airports and let the user decide from that.
-            always ask user for confirmation of details before listing flights.
-            on basis of finalised details respond with flights
-            current year is: {self.current_year}
+            When gathering details on nearby relevant airports for outbound and inbound locations, list the top 5 options with its information, IATA code, full name, city, and distance/proximity, and let the user select from them.
+            Always summarize and list all collected information (e.g., locations, dates, passenger details) clearly, then ask the user for confirmation before proceeding to list flights.
+            Once details are finalized, respond with flight options based on them.
+            Do not ask the user for the current year; assume it is {self.current_year}.
         """
         self.memory = MemorySaver()
         self.graph = self._build_graph(system_message)
@@ -81,9 +81,13 @@ class TravelAgent:
 
         return str(uuid.uuid4())
 
-    async def process_message(self, message: str, history: List, thread: str) -> Tuple[List, Dict, Dict, Dict]:
+    async def process_message(self, message: str, history: List, thread: str) -> Tuple[List, Dict, Dict]:
         """ Process a user message and return updated history, flight data and original params """
-
+        if not message and not history:
+            initial_content = "Hello! Welcome to our travel chatbot. I'm here to help you find and book the perfect flights. Where would you like to go?"
+            history = [{"role": "assistant", "content": initial_content}]
+            return history, {}, None
+            
         config = {"configurable": {"thread_id": thread}}
         # as the accumulator is add_message, the state message will be updated automatically
         state = State(messages=[HumanMessage(content=message)])
@@ -112,22 +116,30 @@ class TravelAgent:
 
         flight_data = {}
         original_params = None
+        tool_call_id = None
 
         for message in reversed(messages):
-            if isinstance(message, ToolMessage) and message.name == "get_flights": # this thing is looking for the tool message coming from the tool, the message coming from the tool node is flights data in this case 
+            if isinstance(message, ToolMessage) and message.name == "get_flights": 
+                # this thing is looking for the tool message coming from the tool, the message coming from the tool node is flights data in this case 
                 try:
                     flight_data = json.loads(message.content)
-                    for prev_msg in reversed(messages):
-                        # here we need to find the params used for tool calls by backtracking the messages again as the tool message only contains response coming from the tool, params used to call the tool is not part of it, it is present inside the tool call of the previos message
-                        if hasattr(prev_msg, "tool_calls"):
-                            for call in prev_msg.tool_calls:
-                                if call.get("name") == "get_flights":
-                                    original_params = call.get("args", {}).get("params", {})
-                                    break
-                                
+                    tool_call_id = message.tool_call_id
+                    break
                 except json.JSONDecodeError:
                     flight_data = {"error": "Failed to parse flight data"}
                 break
+        if tool_call_id:
+            for prev_msg in reversed(messages):
+                if hasattr(prev_msg, "tool_calls") and prev_msg.tool_calls:
+                    print("+"*50)
+                    print("Tool calls in previous message:")
+                    print(prev_msg.tool_calls)
+                    print("+"*50)
+                    for call in prev_msg.tool_calls:
+                        if call.get("id") == tool_call_id and call.get("name") == "get_flights":
+                            original_params = call.get("args", {}).get("params", {})
+                            return flight_data, original_params  # Return immediately after finding the matching call
+
         print("original_params:", original_params)
         return flight_data, original_params
 

@@ -3,6 +3,7 @@ from frontend.utils import book_flight
 from frontend.components.ui_manager import UIManager
 from backend.agents.travel_agent import TravelAgent
 from backend.transcript.main import AssemblyAITranscriber
+import asyncio  # NEW: Import asyncio for handling async init
 
 MAX_FLIGHTS = 20
 MAX_BOOKING_OPTIONS = 10
@@ -35,8 +36,7 @@ CSS = """
     border-radius: 8px !important;
     border: 1px solid var(--flight-border) !important;
     padding: 0 !important;
-    max-height: 500px !important;
-    min-height: 0 !important;
+    height: 500px !important;
     overflow: hidden !important;
     box-shadow: var(--flight-shadow) !important;
 }
@@ -136,7 +136,7 @@ CSS = """
     display: flex !important;
     flex-direction: column !important;
     flex: 1 1 auto !important;
-    min-height: 0 !important;
+    height: 500px !important;
     overflow: hidden !important;
 }
 
@@ -150,6 +150,7 @@ CSS = """
     line-height: 1.6 !important;
     overflow-y: auto !important;
     max-height: 500px !important;
+    min-height: calc(500px - 120px) !important; /* Adjust for button row height */
 }
 
 .flight-details h1, .flight-details h2, .flight-details h3 {
@@ -257,6 +258,7 @@ CSS = """
     padding-bottom: 1rem !important;
     overflow-y: auto !important;
     max-height: 500px !important;
+    min-height: calc(500px - 120px) !important; /* Adjust for button row height */
 }
 
 /* Button row styling */
@@ -289,7 +291,8 @@ CSS = """
 }
 
 #booking-content {
-    max-height: 400px !important;
+    max-height: 500px !important;
+    min-height: calc(500px - 40px) !important; /* Slight adjustment since no buttons */
     overflow-y: auto !important;
     padding: 1rem !important;
 }
@@ -314,21 +317,48 @@ CSS = """
     background: #6b7280 !important;
 }
 
+/* Booking options styling */
+.booking-option {
+    background: var(--flight-surface) !important;
+    border: 1px solid var(--flight-border) !important;
+    border-radius: 6px !important;
+    padding: 1rem !important;
+    margin-bottom: 1rem !important;
+    overflow: visible !important;
+}
+
+.booking-option .markdown:first-child {
+    font-size: 1.1em !important;
+    font-weight: bold !important;
+    color: var(--flight-text) !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.booking-option .button {
+    width: 100% !important;
+}
+
+.booking-option .markdown:last-child {
+    margin-top: 1rem !important;
+    color: var(--flight-text-secondary) !important;
+}
 
 /* Responsive design */
 @media (max-width: 768px) {
     #flight-container {
         height: auto !important;
         max-height: 80vh !important;
+        height: 80vh !important;
     }
 
-    .button-row {
-        justify-content: center !important;
+    .flight-view {
+        height: 80vh !important;
     }
-    
+
     .cards-grid {
         grid-template-columns: 1fr !important;
         max-height: 350px !important;
+        min-height: calc(80vh - 120px) !important;
     }
     
     .card-container {
@@ -341,7 +371,13 @@ CSS = """
     }
     
     #booking-content {
-        max-height: 300px !important;
+        max-height: 80vh !important;
+        min-height: calc(80vh - 40px) !important;
+    }
+
+    .flight-details {
+        max-height: 80vh !important;
+        min-height: calc(80vh - 120px) !important;
     }
 }
 """
@@ -352,6 +388,11 @@ def create_travel_app():
     travel_agent = TravelAgent()
     transcriber = AssemblyAITranscriber()
 
+    # Async function to initialize chat with welcome message
+    async def init_chat(thread_id):
+        initial_history, _, _ = await travel_agent.process_message("", [], thread_id)
+        return initial_history
+
     def toggle_transcription(is_recording, current_message):
         if is_recording:
             transcriber.stop()
@@ -360,6 +401,7 @@ def create_travel_app():
         else:
             transcriber.start()
             return True, "", gr.update(value="🔴")
+    
     def create_booking_handler(option_index):
         """ Create booking handler for specific option """
 
@@ -452,6 +494,7 @@ def create_travel_app():
         gr.Markdown("Enter your travel query")
         
         thread_id_state = gr.State(travel_agent.make_thread_id())
+        
         current_view = gr.State(value=VIEW_OUTBOUND_CARDS)
         initial_flight_payload = gr.State(value={})
         outbound_flights_state = gr.State(value={})
@@ -548,7 +591,7 @@ def create_travel_app():
                         
                         with gr.Column(visible=False, elem_classes=["flight-view"]) as flight_booking_section:
                             with gr.Column(elem_id="booking-content"):
-                                with gr.Column(elem_classes=["flight-content"]):
+                                with gr.Column(elem_classes=["booking-content"]):
                                     gr.Markdown("# Flight Booking Options")
                                     gr.Markdown("Select a booking option to proceed to the booking partner's website.")
                                 
@@ -558,10 +601,10 @@ def create_travel_app():
                                     booking_results = []
                                 
                                     for i in range(MAX_BOOKING_OPTIONS):
-                                        with gr.Group(visible=False) as group:
+                                        with gr.Group(visible=False, elem_classes=["booking-option"]) as group:
                                             info_md = gr.Markdown("")
                                             btn = gr.Button("Book", elem_classes=["primary-btn"])
-                                            result = gr.Markdown(label=f"Booking Result {i+1}")
+                                            result = gr.Markdown(label=f"Booking Result {i+1}", show_label=False)
                                         
                                             info_mds.append(info_md)
                                             booking_buttons.append(btn)
@@ -790,7 +833,7 @@ def create_travel_app():
             fn=UIManager.update_booking_ui,
             inputs=booking_data_state,
             outputs=booking_groups + info_mds + [b for b in booking_buttons]
-                ).then(
+        ).then(
             fn=lambda: (gr.update(visible=False), gr.update(value="")),
             outputs=[loader_group, loader_message]
         )
@@ -826,6 +869,7 @@ def create_travel_app():
                 loader_group, loader_message, error_message  # Added
             ]
         )
+        demo.load(init_chat, inputs=thread_id_state, outputs=chatbot)
 
     return demo
 

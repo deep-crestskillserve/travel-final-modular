@@ -15,3 +15,6 @@ test-ui
 *.txt
 *.wav
 *.zip
+*.json
+
+flight_responses
