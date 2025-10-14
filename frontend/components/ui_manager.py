@@ -104,7 +104,12 @@ class UIManager:
                 currency = booking_data.get("search_parameters", {}).get("currency", "INR") if booking_data else "INR"
                 flight_numbers = ', '.join(option.get("marketed_as", []))
                 baggage = ', '.join(option.get("baggage_prices", []))
-                info = f"### Option {i+1}: {book_with}\n**Price**: {price} {currency}\n**Flights**: {flight_numbers}\n**Baggage**: {baggage}"
+                info = (
+                    f"### Option {i+1}: {book_with}<br>"
+                    f"Price: {price} {currency}<br>"
+                    f"Flights: {flight_numbers}<br>"
+                    f"Baggage: {baggage}"
+                )
                 group_visibles.append(gr.update(visible=True))
                 info_updates.append(info)
                 button_values.append(gr.update(value=f"Book with {book_with}", visible=True))

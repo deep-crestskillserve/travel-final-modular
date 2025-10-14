@@ -140,12 +140,12 @@ CSS = """
     overflow: hidden !important;
 }
 
-/* Flight details styling */
+/* Flight details styling - UPDATED: Ensure consistent padding and reinforce scrollbar */
 .flight-details {
     background: var(--flight-surface) !important;
     border: 1px solid var(--flight-border) !important;
     border-radius: 6px !important;
-    padding: 1.5rem !important;
+    padding: 1rem !important;
     color: var(--flight-text) !important;
     line-height: 1.6 !important;
     overflow-y: auto !important;
@@ -257,6 +257,7 @@ CSS = """
     gap: 1rem !important;
     padding-bottom: 1rem !important;
     overflow-y: auto !important;
+    overflow-x: hidden !important;
     max-height: 500px !important;
     min-height: calc(500px - 120px) !important; /* Adjust for button row height */
 }
@@ -290,6 +291,46 @@ CSS = """
     background: #6b7280 !important;
 }
 
+/* Scrollbar for .cards-grid (unchanged - matches booking) */
+.cards-grid::-webkit-scrollbar {
+    width: 12px !important;
+}
+
+.cards-grid::-webkit-scrollbar-track {
+    background: var(--flight-bg) !important;
+    border-radius: 6px !important;
+}
+
+.cards-grid::-webkit-scrollbar-thumb {
+    background: var(--flight-border) !important;
+    border-radius: 6px !important;
+    border: 2px solid var(--flight-bg) !important;
+}
+
+.cards-grid::-webkit-scrollbar-thumb:hover {
+    background: #6b7280 !important;
+}
+
+/* Scrollbar for .flight-details - UPDATED: Reinforced specificity with !important */
+.flight-details::-webkit-scrollbar {
+    width: 12px !important;
+}
+
+.flight-details::-webkit-scrollbar-track {
+    background: var(--flight-bg) !important;
+    border-radius: 6px !important;
+}
+
+.flight-details::-webkit-scrollbar-thumb {
+    background: var(--flight-border) !important;
+    border-radius: 6px !important;
+    border: 2px solid var(--flight-bg) !important;
+}
+
+.flight-details::-webkit-scrollbar-thumb:hover {
+    background: #6b7280 !important;
+}
+
 #booking-content {
     max-height: 500px !important;
     min-height: calc(500px - 40px) !important; /* Slight adjustment since no buttons */
@@ -297,7 +338,7 @@ CSS = """
     padding: 1rem !important;
 }
 
-/* Scrollbar styling for booking options */
+/* Scrollbar styling for booking options (unchanged - reference) */
 #booking-content::-webkit-scrollbar {
     width: 12px !important;
 }
@@ -378,6 +419,7 @@ CSS = """
     .flight-details {
         max-height: 80vh !important;
         min-height: calc(80vh - 120px) !important;
+        padding: 1rem !important;
     }
 }
 """
@@ -866,8 +908,12 @@ def create_travel_app():
                 
                 # Booking section
                 *booking_groups, *info_mds, *booking_buttons, *booking_results,
-                loader_group, loader_message, error_message  # Added
+                loader_group, loader_message, error_message
             ]
+        ).then(  # Chain to sync inner view visibilities after reset
+            fn=UIManager.update_view,
+            inputs=current_view,
+            outputs=[outbound_flight_cards, return_flight_cards, outbound_flight_details, return_flight_details, flight_booking_section]
         )
         demo.load(init_chat, inputs=thread_id_state, outputs=chatbot)
 
