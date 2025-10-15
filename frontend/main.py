@@ -342,6 +342,14 @@ CSS = """
     color: var(--flight-text-secondary) !important;
 }
 
+.booking-option .button-row {
+    display: flex !important;
+    gap: 0.75rem !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
     #flight-container {
@@ -402,23 +410,88 @@ def create_travel_app():
             transcriber.start()
             return True, "", gr.update(value="🔴")
     
-    def create_booking_handler(option_index):
-        """ Create booking handler for specific option """
+    def get_post_data(option_index):
+        """Gives post_data for separate tickets and together tickets."""
 
-        def handle_booking(booking_data):
+        def extract_post_data(booking_data):
+
+            post_data = ""
+            departure_post_data = ""
+            return_post_data = ""
+            booking_phone = ""
+            departure_booking_phone = ""
+            return_booking_phone = ""
+
             booking_options = booking_data.get("booking_options", []) if booking_data else []
-            if option_index < len(booking_options):
-                post_data = booking_options[option_index].get("together", {}).get("booking_request", {}).get("post_data", "")
-                result = book_flight(post_data)
-                if result.startswith("[Click here to complete booking]"):
-                    # NEW: Extract URL and enable redirect button
-                    url_match = re.search(r"\[(.*?)\]\((.*?)\)", result)
-                    if url_match:
-                        url = url_match.group(2)
-                        return "Booking request processed successfully!", gr.update(interactive=True, value="Book Now", _js=f"window.location.href='{url}'")
-                return result, gr.update(interactive=False)
-            return "⚠️ Invalid option", gr.update(interactive=False)
+            
+            if option_index >= len(booking_options):
+                return post_data, departure_post_data, return_post_data, booking_phone, departure_booking_phone, return_booking_phone
+            
+            option = booking_options[option_index]
+            
+            # Handle separate tickets (departing and returning legs)
+            if option.get("departing") and option.get("returning"):
+                departure_post_data = option.get("departing", {}).get("booking_request", {}).get("post_data", "")
+                departure_booking_phone = option.get("departing", {}).get("booking_phone", "")
+                return_post_data = option.get("returning", {}).get("booking_request", {}).get("post_data", "")
+                return_booking_phone = option.get("returning", {}).get("booking_phone", "")
+            # Handle together tickets
+            elif option.get("together"):
+                post_data = option.get("together", {}).get("booking_request", {}).get("post_data", "")
+                booking_phone = option.get("together", {}).get("booking_phone", "")
+            
+            return post_data, departure_post_data, return_post_data, booking_phone, departure_booking_phone, return_booking_phone
+        
+        return extract_post_data
+
+    def create_booking_handler(option_index):
+        """Create booking handler for specific option."""
+        def handle_booking(booking_data):
+            """Handle booking for a specific option."""
+            print('\n'*5)
+            print(f"option index: {option_index}")
+            print('\n'*5)
+            booking_options = booking_data.get("booking_options", []) if booking_data else []
+            if option_index >= len(booking_options):
+                return "⚠️ Invalid option", gr.update(interactive=False, visible=False), ""
+
+            post_data, departure_post_data, return_post_data, booking_phone, departure_booking_phone, return_booking_phone = get_post_data(option_index)(booking_data)
+
+            if departure_post_data and return_post_data:
+                # Handle round-trip booking with separate legs
+                result_depart = book_flight(departure_post_data, departure_booking_phone)
+                result_return = book_flight(return_post_data, return_booking_phone)
+                if result_depart["success"] and result_return["success"]:
+                    combined_url = f"Departure: {result_depart['url']} | Return: {result_return['url']}"
+                    return (
+                        f"Departure: {result_depart['message']}\nReturn: {result_return['message']}",
+                        gr.update(interactive=True, visible=True, value="Book Now"),
+                        combined_url
+                    )
+                else:
+                    msg = f"Departure: {result_depart['message']}\nReturn: {result_return['message']}"
+                    return msg, gr.update(interactive=False, visible=False), ""
+            else:
+                # Handle one-way or together booking
+                result = book_flight(post_data, booking_phone)
+                if result["success"]:
+                    return (
+                        result["message"],
+                        gr.update(interactive=True, visible=True, value="Book Now"),
+                        result["url"]
+                    )
+                else:
+                    return result["message"], gr.update(interactive=False, visible=False), ""
+
         return handle_booking
+
+    def create_redirect_handler(option_index):
+        """ Create redirect handler for specific option """
+        
+        def handle_redirect(booking_url):
+            # This function will be enhanced with JavaScript
+            return booking_url
+        return handle_redirect
 
     def update_button_visibility(params):
         """ Update button visibility of outbound_flight_cards buttons based on trip type """
@@ -448,8 +521,9 @@ def create_travel_app():
         hidden_booking_groups = [gr.update(visible=False)] * MAX_BOOKING_OPTIONS
         empty_info_updates = [""] * MAX_BOOKING_OPTIONS
         hidden_booking_buttons = [gr.update(visible=False)] * MAX_BOOKING_OPTIONS
-        hidden_redirect_buttons = [gr.update(visible=False)] * MAX_BOOKING_OPTIONS  # NEW: Reset redirect buttons
+        hidden_redirect_buttons = [gr.update(visible=False)] * MAX_BOOKING_OPTIONS
         empty_booking_results = [""] * MAX_BOOKING_OPTIONS
+        empty_booking_urls = [""] * MAX_BOOKING_OPTIONS
         
         return (
             # Basic inputs/outputs
@@ -494,6 +568,7 @@ def create_travel_app():
             *hidden_booking_buttons,  # booking_buttons visibility
             *hidden_redirect_buttons,  # NEW: redirect_buttons visibility
             *empty_booking_results,  # booking_results content
+            *empty_booking_urls, # booking_urls content
             gr.update(visible=False),  # loader_group
             gr.update(value=""),  # loader_message
             gr.update(visible=False),  # error_message
@@ -607,28 +682,89 @@ def create_travel_app():
                                     booking_groups = []
                                     info_mds = []
                                     booking_buttons = []
-                                    redirect_buttons = []  # NEW: List to store redirect buttons
+                                    redirect_buttons = []
                                     booking_results = []
+                                    booking_urls = []
                                 
                                     for i in range(MAX_BOOKING_OPTIONS):
                                         with gr.Group(visible=False, elem_classes=["booking-option"]) as group:
                                             info_md = gr.Markdown("")
-                                            # NEW: Row for Book and Book Now buttons
+                                            # Row for Book and Book Now buttons
                                             with gr.Row(elem_classes=["button-row"]):
                                                 btn = gr.Button("Book", elem_classes=["primary-btn"])
-                                                redirect_btn = gr.Button("Book Now", elem_classes=["primary-btn"], interactive=False)
+                                                redirect_btn = gr.Button("Book Now", elem_classes=["primary-btn"], interactive=False, visible=False)  # ADDED: visible=False initially
                                             result = gr.Markdown(label=f"Booking Result {i+1}", show_label=False)
+                                            booking_url = gr.State("")
                                         
                                             info_mds.append(info_md)
                                             booking_buttons.append(btn)
-                                            redirect_buttons.append(redirect_btn)  # NEW: Add redirect button
+                                            redirect_buttons.append(redirect_btn)
                                             booking_results.append(result)
+                                            booking_urls.append(booking_url)
                                         
-                                            # NEW: Update outputs to include redirect button
+                                            # Book button click - get booking URL
                                             btn.click(
                                                 fn=create_booking_handler(i),
                                                 inputs=booking_data_state,
-                                                outputs=[booking_results[i], redirect_buttons[i]]
+                                                outputs=[booking_results[i], redirect_buttons[i], booking_urls[i]]
+                                            )
+
+                                            # Redirect button click - open URL in new tab
+                                            redirect_btn.click(
+                                                fn=None,  # No Python function needed
+                                                inputs=booking_urls[i],
+                                                outputs=None,
+                                                js="""(url) => {
+                                                    console.log('Redirect clicked, URL:', url);
+                                                    
+                                                    if (!url || url === '') {
+                                                        console.error('No URL provided to redirect');
+                                                        alert('No booking URL available. Please try clicking Book again.');
+                                                        return;
+                                                    }
+                                                    
+                                                    if (url.includes('|')) {
+                                                        // Parse combined URL string (round-trip with separate tickets)
+                                                        console.log('Processing combined URLs (separate tickets)');
+                                                        const parts = url.split('|');
+                                                        let urlsOpened = 0;
+                                                        
+                                                        parts.forEach((part, index) => {
+                                                            console.log(`Processing part ${index}:`, part);
+                                                            const colonIndex = part.indexOf(':');
+                                                            if (colonIndex !== -1) {
+                                                                const link = part.substring(colonIndex + 1).trim();
+                                                                console.log('Extracted link:', link);
+                                                                if (link && link.startsWith('http')) {
+                                                                    const opened = window.open(link, '_blank', 'noopener,noreferrer');
+                                                                    if (opened) {
+                                                                        urlsOpened++;
+                                                                        console.log(`Successfully opened URL ${urlsOpened}`);
+                                                                    } else {
+                                                                        console.error('Failed to open URL - popup blocked?');
+                                                                    }
+                                                                }
+                                                            }
+                                                        });
+                                                        
+                                                        if (urlsOpened === 0) {
+                                                            alert('Failed to open booking URLs. Please check your popup blocker.');
+                                                        }
+                                                    } else if (url.startsWith('http')) {
+                                                        // Single URL
+                                                        console.log('Opening single URL:', url);
+                                                        const opened = window.open(url, '_blank', 'noopener,noreferrer');
+                                                        if (!opened) {
+                                                            console.error('Failed to open URL - popup blocked?');
+                                                            alert('Failed to open booking URL. Please check your popup blocker.');
+                                                        } else {
+                                                            console.log('Successfully opened booking URL');
+                                                        }
+                                                    } else {
+                                                        console.error('Invalid URL format:', url);
+                                                        alert('Invalid booking URL format. Please try again.');
+                                                    }
+                                                }"""
                                             )
                                         booking_groups.append(group)
 
@@ -752,10 +888,9 @@ def create_travel_app():
             inputs=current_view,
             outputs=[outbound_flight_cards, return_flight_cards, outbound_flight_details, return_flight_details, flight_booking_section]
         ).then(
-            # NEW: Include redirect_buttons in outputs
             fn=UIManager.update_booking_ui,
             inputs=booking_data_state,
-            outputs=booking_groups + info_mds + booking_buttons + redirect_buttons
+            outputs=booking_groups + info_mds + booking_buttons + redirect_buttons + booking_urls  # UPDATED
         ).then(
             fn=lambda: (gr.update(visible=False), gr.update(value="")),
             outputs=[loader_group, loader_message]
@@ -846,10 +981,9 @@ def create_travel_app():
             inputs=current_view,
             outputs=[outbound_flight_cards, return_flight_cards, outbound_flight_details, return_flight_details, flight_booking_section]
         ).then(
-            # NEW: Include redirect_buttons in outputs
             fn=UIManager.update_booking_ui,
             inputs=booking_data_state,
-            outputs=booking_groups + info_mds + booking_buttons + redirect_buttons
+            outputs=booking_groups + info_mds + booking_buttons + redirect_buttons + booking_urls  # UPDATED
         ).then(
             fn=lambda: (gr.update(visible=False), gr.update(value="")),
             outputs=[loader_group, loader_message]
@@ -882,7 +1016,7 @@ def create_travel_app():
                 return_flight_details_box,
                 
                 # Booking section
-                *booking_groups, *info_mds, *booking_buttons, *redirect_buttons, *booking_results,  # NEW: Added redirect_buttons
+                *booking_groups, *info_mds, *booking_buttons, *redirect_buttons, *booking_results,  *booking_urls,
                 loader_group, loader_message, error_message
             ]
         ).then(  # Chain to sync inner view visibilities after reset

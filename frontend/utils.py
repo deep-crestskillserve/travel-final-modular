@@ -25,11 +25,19 @@ def extract_redirect_url(html_content: str) -> Optional[str]:
         return match.group(1)
     return None
 
-def book_flight(post_data: str) -> str:
-    """ Initiates flight booking by posting to Google and extracting the redirect URL. """
+def book_flight(post_data: str, booking_phone: str) -> dict:
+    """ 
+    Initiates flight booking by posting to Google and extracting the redirect URL.
+    Returns a dict with:
+    - 'success': bool
+    - 'url': str or None (redirect URL if successful)
+    - 'message': str (success or error message)
+    """
     
+    if not post_data and not booking_phone:
+        return {"success": False, "url": None, "message": "No booking data available for this flight option"}
     if not post_data:
-        return "No booking link provided."
+        return {"success": False, "url": None, "message": f"Booking phone number provided: {booking_phone}. Please visit the airline's website to complete your booking."}
     url = "https://www.google.com/travel/clk/f"
     if post_data.startswith("u="):
         post_data_value = post_data[2:]
@@ -57,19 +65,18 @@ def book_flight(post_data: str) -> str:
             verify=certifi.where(), 
             timeout=10
         )
-        # logger.info(f"post_data: {post_data_value}")
         if response.status_code == 200:
             redirect_url = extract_redirect_url(response.text)
             if redirect_url:
-                return f"[Click here to complete booking]({redirect_url})"
+                return {"success": True, "url": redirect_url, "message": "Booking request processed successfully!"}
             else:
-                return "Failed to extract redirect URL from response."
+                return {"success": False, "url": None, "message": "Failed to extract redirect URL from response."}
         else:
-            return f"Failed to initiate booking. Status code: {response.status_code}"
+            return {"success": False, "url": None, "message": f"Failed to initiate booking. Status code: {response.status_code}"}
     except requests.exceptions.SSLError as ssl_err:
-        return f"SSL Error during booking: {str(ssl_err)}. Check your network"
+        return {"success": False, "url": None, "message": f"SSL Error during booking: {str(ssl_err)}. Check your network"}
     except requests.exceptions.RequestException as e:
-        return f"Error during booking: {str(e)}. Possible network issue or Google blocking the request."
+        return {"success": False, "url": None, "message": f"Error during booking: {str(e)}. Possible network issue or Google blocking the request."}
 
 def build_details(index: Optional[int], flights: List[Dict]) -> str:
     """ Build detailed markdown for a selected flight option. """
@@ -79,11 +86,11 @@ def build_details(index: Optional[int], flights: List[Dict]) -> str:
     logger.info(f"Building details for {ordinal(index + 1)} flight")
     flight = flights[index]
     details = f"## ✈️ Flight Option {index+1}\n"
-    details += f"**Total Duration:** {format_duration(flight.get('total_duration'))}\n"
-    details += f"**Price:** ₹{flight.get('price', 'N/A')}\n"
-    details += f"**Type:** {flight.get('type', 'N/A')}\n"
+    details += f"**Total Duration:** {format_duration(flight.get('total_duration'))}<br>"
+    details += f"**Price:** ₹{flight.get('price', 'N/A')}<br>"
+    details += f"**Type:** {flight.get('type', 'N/A')}<br>"
     carbon = flight.get('carbon_emissions', {})
-    details += f"**Carbon Emissions:** {carbon.get('this_flight', 'N/A')} g (vs {carbon.get('typical_for_this_route', 'N/A')}; difference: {carbon.get('difference_percent', 'N/A')}%) \n\n"
+    details += f"**Carbon Emissions:** {carbon.get('this_flight', 'N/A')} g (vs {carbon.get('typical_for_this_route', 'N/A')}; difference: {carbon.get('difference_percent', 'N/A')}%) <br>"
 
     for i, f in enumerate(flight.get("flights", []), 1):
         details += f"### Leg {i}\n"

@@ -1,0 +1,59 @@
+{
+    "search_metadata": {
+        "id": "68ece39886e9fa000d75081e",
+        "status": "Success",
+        "json_endpoint": "https://serpapi.com/searches/54b6f836da125df7/68ece39886e9fa000d75081e.json",
+        "created_at": "2025-10-13 11:33:44 UTC",
+        "processed_at": "2025-10-13 11:33:44 UTC",
+        "google_flights_url": "https://www.google.com/travel/flights?hl=en&gl=in&curr=INR&tfs=CBwQAhoeEgoyMDI1LTEwLTEzagcIARIDU1RWcgcIARIDVkZBQgQBAQICSAFwAZgBAg&tfu=EgIIAQ",
+        "raw_html_file": "https://serpapi.com/searches/54b6f836da125df7/68ece39886e9fa000d75081e.html",
+        "prettify_html_file": "https://serpapi.com/searches/54b6f836da125df7/68ece39886e9fa000d75081e.prettify",
+        "total_time_taken": 1.72
+    },
+    "search_parameters": {
+        "engine": "google_flights",
+        "hl": "en",
+        "gl": "in",
+        "type": "2",
+        "departure_id": "STV",
+        "arrival_id": "VFA",
+        "outbound_date": "2025-10-13",
+        "adults": 2,
+        "children": 2,
+        "currency": "INR"
+    },
+    "airports": [
+        {
+            "departure": [
+                {
+                    "airport": {
+                        "id": "STV",
+                        "name": "Surat International Airport"
+                    },
+                    "city": "Surat",
+                    "country": "India",
+                    "country_code": "IN",
+                    "image": "https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcRjYscVYUHr0VEzaCmhUoIR6AoBzrj4iysI0gKqMOdBOYcuO-KVn4B8ZM-U6FAr-eBqj0r41GBpnwoz3NfRSR95QIjYpYfwjA2EmYRxASQ",
+                    "thumbnail": "https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcSn_eD1e2l3xE-1GAXSfBnee30JYcfPcjFKVBBLmFmCpxIY9hrQARlEOclwfU8JZ0zLF3z3v05G5kARQv6G-8_TgpWOViGgrJbEVLp3B9M"
+                }
+            ],
+            "arrival": [
+                {
+                    "airport": {
+                        "id": "VFA",
+                        "name": "Victoria Falls International Airport (VFA)"
+                    },
+                    "city": "Victoria Falls",
+                    "country": "Zimbabwe",
+                    "country_code": "ZW",
+                    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQl9logrC3cSBZk50xlj_utNsYjl3Xr5lNtgT021qAoqTPs9M5G139bqBtaPSPWYLSWHGw0X9Su2q6vtQ",
+                    "thumbnail": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrNAzmG-25krsQo8NiFMZAGud7NKhHRn5EkWCQ3xqv_VnpkyqXZxBU8tdst67Ngjk8STY8DxaK5Na9Qn1atJK3QqsIRJx0yBKk5xjj7Oc"
+                }
+            ]
+        }
+    ],
+    "search_information": {
+        "flights_results_state": "Fully empty"
+    },
+    "error": "Google Flights hasn't returned any results for this query."
+}

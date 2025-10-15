@@ -25,7 +25,8 @@ SERPAPI_PARAMETERS = {
     'engine': 'google_flights',
     'hl': 'en',
     'gl': 'in',
-    'currency': 'INR'
+    'currency': 'INR',
+    'deep_research': True
 }
 
 class FlightsInput(BaseModel):

@@ -1,0 +1,5 @@
+{
+    "error": "`outbound_date` cannot be in the past.", 
+    "error": "`return_date` cannot be earlier than `outbound_date`.",
+    "error": "`outbound_date` cannot be in the past."
+}
