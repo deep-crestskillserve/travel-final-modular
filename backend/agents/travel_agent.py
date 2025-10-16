@@ -62,15 +62,12 @@ class TravelAgent:
         messages = [SystemMessage(content=system_message)] + state.messages
         worker_llm = self.llm.bind_tools(self.TOOLS)
         response = worker_llm.invoke(messages)
-        # print(json.dumps(state.model_dump(), indent=2, default=str))
         return {'messages': [response]}
 
     def _worker_router(self, state: State) -> str:
         """ Decide whether to invoke tools or end the conversation """
 
         last_message = state.messages[-1]
-        # print("-"*50)
-        # print(json.dumps(state.model_dump(), indent=2, default=str))
         if hasattr(last_message, "tool_calls") and last_message.tool_calls:
             return "tools"
         return END
@@ -89,13 +86,16 @@ class TravelAgent:
             return history, {}, None
             
         config = {"configurable": {"thread_id": thread}}
-        # as the accumulator is add_message, the state message will be updated automatically
+        # Get previous state to determine the length of existing messages
+        previous_state = self.graph.get_state(config)
+        previous_messages_len = len(previous_state.values.get("messages", [])) if previous_state and previous_state.values else 0
+        # As the accumulator is add_message, the state message will be updated automatically
         state = State(messages=[HumanMessage(content=message)])
         try:
             result = await self.graph.ainvoke(state, config=config)
         except Exception as e:
             print(f"Graph error: {e}")
-            return history + [{"role": "assistant", "content": f"System error: {str(e)}"}], {"error": str(e)}
+            return history + [{"role": "assistant", "content": f"System error: {str(e)}"}], {"error": str(e)}, None
         
         user = {"role": "user", "content": message}
         history = history + [user]
@@ -103,44 +103,50 @@ class TravelAgent:
         reply = {"role": "assistant", "content": ai_msg.content}
         history = history + [reply]
 
-        flight_data, original_params = self._extract_flight_data_and_params(result["messages"])
-        if self._has_available_flights(flight_data):
+        # Check if flights were fetched IN THIS TURN ONLY by slicing new messages
+        new_messages = result["messages"][previous_messages_len:]
+        flight_data, original_params = self._extract_flight_data_and_params(new_messages)
+        flights_fetched_this_turn = self._has_available_flights(flight_data)
+        
+        if flights_fetched_this_turn:
             print("-"*50, "\n", original_params, "\n", "-"*50)
             history[-1]["content"] += "\n\nI've loaded the available flights in the panel to the right. Please select one to view details and booking options."
-        
-        return history, flight_data, original_params
-        
+            print("**"*50)
+            print(json.dumps(state.model_dump(), indent=2, default=str))
+            # Return the flight data only if fetched this turn
+            return history, flight_data, original_params
+        else:
+            # Return empty flight data if no new flights were fetched
+            return history, {}, None
+
 
     def _extract_flight_data_and_params(self, messages: List) -> Tuple[Dict, Optional[Dict]]:
-        """ Extract flight data and original params from tool response messages """
+        """ Extract flight data and original params from tool response messages in the current turn """
 
         flight_data = {}
         original_params = None
         tool_call_id = None
 
+        # Look for ToolMessage from get_flights in the current turn's messages
         for message in reversed(messages):
-            if isinstance(message, ToolMessage) and message.name == "get_flights": 
-                # this thing is looking for the tool message coming from the tool, the message coming from the tool node is flights data in this case 
+            if isinstance(message, ToolMessage) and message.name == "get_flights":
                 try:
                     flight_data = json.loads(message.content)
                     tool_call_id = message.tool_call_id
                     break
                 except json.JSONDecodeError:
                     flight_data = {"error": "Failed to parse flight data"}
-                break
+                    break
+
+        # If a ToolMessage was found, find the corresponding tool call in the same turn
         if tool_call_id:
             for prev_msg in reversed(messages):
                 if hasattr(prev_msg, "tool_calls") and prev_msg.tool_calls:
-                    print("+"*50)
-                    print("Tool calls in previous message:")
-                    print(prev_msg.tool_calls)
-                    print("+"*50)
                     for call in prev_msg.tool_calls:
                         if call.get("id") == tool_call_id and call.get("name") == "get_flights":
                             original_params = call.get("args", {}).get("params", {})
-                            return flight_data, original_params  # Return immediately after finding the matching call
+                            return flight_data, original_params
 
-        print("original_params:", original_params)
         return flight_data, original_params
 
     def _has_available_flights(self, flight_data: Dict) -> bool:
