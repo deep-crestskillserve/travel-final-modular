@@ -453,7 +453,7 @@ def create_travel_app():
             print('\n'*5)
             booking_options = booking_data.get("booking_options", []) if booking_data else []
             if option_index >= len(booking_options):
-                return "⚠️ Invalid option", gr.update(interactive=False, visible=False), ""
+                return "⚠️ Invalid option", ""
 
             post_data, departure_post_data, return_post_data, booking_phone, departure_booking_phone, return_booking_phone = get_post_data(option_index)(booking_data)
 
@@ -462,36 +462,30 @@ def create_travel_app():
                 result_depart = book_flight(departure_post_data, departure_booking_phone)
                 result_return = book_flight(return_post_data, return_booking_phone)
                 if result_depart["success"] and result_return["success"]:
-                    combined_url = f"Departure: {result_depart['url']} | Return: {result_return['url']}"
-                    return (
-                        f"Departure: {result_depart['message']}\nReturn: {result_return['message']}",
-                        gr.update(interactive=True, visible=True, value="Book Now"),
-                        combined_url
+                    message = (
+                        f"Departure: {result_depart['message']}<br>"
+                        f'[Click here to book departure fligths]({result_depart["url"]})<br><br>'
+                        f"Return: {result_return['message']}<br>"
+                        f'[Click here to book return flights]({result_return["url"]})'
                     )
+                    return message, f"Departure: {result_depart['url']} | Return: {result_return['url']}"
                 else:
-                    msg = f"Departure: {result_depart['message']}\nReturn: {result_return['message']}"
-                    return msg, gr.update(interactive=False, visible=False), ""
+                    msg = f"Departure: {result_depart['message']}<br>Return: {result_return['message']}"
+                    return msg, ""
             else:
                 # Handle one-way or together booking
                 result = book_flight(post_data, booking_phone)
                 if result["success"]:
-                    return (
-                        result["message"],
-                        gr.update(interactive=True, visible=True, value="Book Now"),
-                        result["url"]
+                    # Format as markdown with hyperlink (target="_blank" for new tab)
+                    message = (
+                        f"{result['message']}<br>"
+                        f'[Click here to continue booking]({result["url"]})'
                     )
+                    return message, result["url"]
                 else:
-                    return result["message"], gr.update(interactive=False, visible=False), ""
+                    return result["message"], ""
 
         return handle_booking
-
-    def create_redirect_handler(option_index):
-        """ Create redirect handler for specific option """
-        
-        def handle_redirect(booking_url):
-            # This function will be enhanced with JavaScript
-            return booking_url
-        return handle_redirect
 
     def update_button_visibility(params):
         """ Update button visibility of outbound_flight_cards buttons based on trip type """
@@ -521,7 +515,6 @@ def create_travel_app():
         hidden_booking_groups = [gr.update(visible=False)] * MAX_BOOKING_OPTIONS
         empty_info_updates = [""] * MAX_BOOKING_OPTIONS
         hidden_booking_buttons = [gr.update(visible=False)] * MAX_BOOKING_OPTIONS
-        hidden_redirect_buttons = [gr.update(visible=False)] * MAX_BOOKING_OPTIONS
         empty_booking_results = [""] * MAX_BOOKING_OPTIONS
         empty_booking_urls = [""] * MAX_BOOKING_OPTIONS
         
@@ -566,7 +559,6 @@ def create_travel_app():
             *hidden_booking_groups,  # booking_groups visibility
             *empty_info_updates,  # info_mds content
             *hidden_booking_buttons,  # booking_buttons visibility
-            *hidden_redirect_buttons,  # NEW: redirect_buttons visibility
             *empty_booking_results,  # booking_results content
             *empty_booking_urls, # booking_urls content
             gr.update(visible=False),  # loader_group
@@ -682,94 +674,37 @@ def create_travel_app():
                                     booking_groups = []
                                     info_mds = []
                                     booking_buttons = []
-                                    redirect_buttons = []
                                     booking_results = []
                                     booking_urls = []
                                 
                                     for i in range(MAX_BOOKING_OPTIONS):
                                         with gr.Group(visible=False, elem_classes=["booking-option"]) as group:
                                             info_md = gr.Markdown("")
-                                            # Row for Book and Book Now buttons
+                                            # Row for Book button only
                                             with gr.Row(elem_classes=["button-row"]):
                                                 btn = gr.Button("Book", elem_classes=["primary-btn"])
-                                                redirect_btn = gr.Button("Book Now", elem_classes=["primary-btn"], interactive=False, visible=False)
                                             result = gr.Markdown(label=f"Booking Result {i+1}", show_label=False)
-                                            # Use hidden Textbox instead of State
                                             booking_url = gr.Textbox(
                                                 value="",
-                                                visible=False,  # Hidden in UI
-                                                elem_id=f"booking_url_{i}",  # Unique ID for JS
+                                                visible=False,
+                                                elem_id=f"booking_url_{i}",
                                                 show_label=False
                                             )
                                         
                                             info_mds.append(info_md)
                                             booking_buttons.append(btn)
-                                            redirect_buttons.append(redirect_btn)
                                             booking_results.append(result)
                                             booking_urls.append(booking_url)
                                         
-                                            # Book button click - get booking URL
+                                            # Book button click - get booking URL and show markdown link
                                             btn.click(
                                                 fn=create_booking_handler(i),
                                                 inputs=booking_data_state,
-                                                outputs=[booking_results[i], redirect_buttons[i], booking_urls[i]]
+                                                outputs=[booking_results[i], booking_urls[i]]
                                             ).then(
-                                                fn=lambda url: gr.Info(f"Booking URL generated: {url}") if url else None,
+                                                fn=lambda url: gr.Info(f"Booking URL generated") if url else None,
                                                 inputs=booking_urls[i],
-                                                outputs=None
-                                            )  # Debug: Show URL in Gradio notification
-                                        
-                                            # Redirect button click - open URL in new tab
-                                            redirect_btn.click(
-                                                fn=None,
-                                                inputs=booking_urls[i],
-                                                outputs=None,
-                                                js=f"""(url) => {{
-                                                    console.log('Redirect clicked, URL:', url);
-                                                    
-                                                    if (!url || url === '') {{
-                                                        console.error('No URL provided to redirect');
-                                                        alert('No booking URL available. Please try clicking Book again.');
-                                                        return;
-                                                    }}
-                                                    if (url.includes('|')) {{
-                                                        console.log('Processing combined URLs (separate tickets)');
-                                                        const parts = url.split('|');
-                                                        let urlsOpened = 0;
-                                                        parts.forEach((part, index) => {{
-                                                            console.log(`Processing part ${{index}}:`, part);
-                                                            const colonIndex = part.indexOf(':');
-                                                            if (colonIndex !== -1) {{
-                                                                const link = part.substring(colonIndex + 1).trim();
-                                                                console.log('Extracted link:', link);
-                                                                if (link && link.startsWith('http')) {{
-                                                                    const opened = window.open(link, '_blank', 'noopener,noreferrer');
-                                                                    if (opened) {{
-                                                                        urlsOpened++;
-                                                                        console.log(`Successfully opened URL ${{urlsOpened}}`);
-                                                                    }} else {{
-                                                                        console.error('Failed to open URL - popup blocked?');
-                                                                    }}
-                                                                }}
-                                                            }}
-                                                        }});
-                                                        if (urlsOpened === 0) {{
-                                                            alert('Failed to open booking URLs. Please check your popup blocker.');
-                                                        }}
-                                                    }} else if (url.startsWith('http')) {{
-                                                        console.log('Opening single URL:', url);
-                                                        const opened = window.open(url, '_blank', 'noopener,noreferrer');
-                                                        if (!opened) {{
-                                                            console.error('Failed to open URL - popup blocked?');
-                                                            alert('Failed to open booking URL. Please check your popup blocker.');
-                                                        }} else {{
-                                                            console.log('Successfully opened booking URL');
-                                                        }}
-                                                    }} else {{
-                                                        console.error('Invalid URL format:', url);
-                                                        alert('Invalid booking URL format. Please try again.');
-                                                    }}
-                                                }}"""
+                                                outputs=None  # Debug: Show URL in Gradio notification
                                             )
                                         booking_groups.append(group)
 
@@ -895,7 +830,7 @@ def create_travel_app():
         ).then(
             fn=UIManager.update_booking_ui,
             inputs=booking_data_state,
-            outputs=booking_groups + info_mds + booking_buttons + redirect_buttons + booking_urls  # UPDATED
+            outputs=booking_groups + info_mds + booking_buttons + booking_urls
         ).then(
             fn=lambda: (gr.update(visible=False), gr.update(value="")),
             outputs=[loader_group, loader_message]
@@ -988,7 +923,7 @@ def create_travel_app():
         ).then(
             fn=UIManager.update_booking_ui,
             inputs=booking_data_state,
-            outputs=booking_groups + info_mds + booking_buttons + redirect_buttons + booking_urls  # UPDATED
+            outputs=booking_groups + info_mds + booking_buttons + booking_urls
         ).then(
             fn=lambda: (gr.update(visible=False), gr.update(value="")),
             outputs=[loader_group, loader_message]
@@ -1021,10 +956,10 @@ def create_travel_app():
                 return_flight_details_box,
                 
                 # Booking section
-                *booking_groups, *info_mds, *booking_buttons, *redirect_buttons, *booking_results,  *booking_urls,
+                *booking_groups, *info_mds, *booking_buttons, *booking_results, *booking_urls,
                 loader_group, loader_message, error_message
             ]
-        ).then(  # Chain to sync inner view visibilities after reset
+        ).then(
             fn=UIManager.update_view,
             inputs=current_view,
             outputs=[outbound_flight_cards, return_flight_cards, outbound_flight_details, return_flight_details, flight_booking_section]

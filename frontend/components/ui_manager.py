@@ -98,8 +98,7 @@ class UIManager:
         booking_groups_updates = []
         info_md_updates = []
         booking_button_updates = []
-        redirect_button_updates = []
-        booking_url_updates = []  
+        booking_url_updates = []
         
         for i in range(MAX_BOOKING_OPTIONS):
             if i < len(booking_options):
@@ -108,7 +107,16 @@ class UIManager:
                 price = option.get("price", "N/A")
                 currency = booking_data.get("search_parameters", {}).get("currency", "INR") if booking_data else "INR"
                 flight_numbers = ', '.join(option.get("marketed_as", []))
-                baggage = ', '.join(booking_data.get("baggage_prices", {}).get("together", []))
+                single_ticket = "together" in booking_data.get("baggage_prices", {})
+                if single_ticket:
+                    baggage_data = booking_data.get("baggage_prices", {})
+                    together = baggage_data.get("together", [])
+                    baggage = ', '.join(together)
+                else:
+                    baggage_data = booking_data.get("baggage_prices", {})
+                    departing = baggage_data.get("departing", [])
+                    returning = baggage_data.get("returning", [])
+                    baggage = ', '.join(departing) + " | " + ', '.join(returning)
                 info = (
                     f"### Option {i+1}: {book_with}<br>"
                     f"Price: {price} {currency}<br>"
@@ -118,16 +126,14 @@ class UIManager:
                 booking_groups_updates.append(gr.update(visible=True))
                 info_md_updates.append(info)
                 booking_button_updates.append(gr.update(visible=True))
-                redirect_button_updates.append(gr.update(interactive=False))
                 booking_url_updates.append("")
             else:
                 booking_groups_updates.append(gr.update(visible=False))
                 info_md_updates.append("")
                 booking_button_updates.append(gr.update(visible=False))
-                redirect_button_updates.append(gr.update(interactive=False))
                 booking_url_updates.append("")
         
-        return (booking_groups_updates + info_md_updates + booking_button_updates + redirect_button_updates + booking_url_updates)
+        return (booking_groups_updates + info_md_updates + booking_button_updates + booking_url_updates)
     
     @staticmethod
     def get_flight_details(selected: int, flight_data: Dict, params: Dict):
