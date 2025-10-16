@@ -692,9 +692,15 @@ def create_travel_app():
                                             # Row for Book and Book Now buttons
                                             with gr.Row(elem_classes=["button-row"]):
                                                 btn = gr.Button("Book", elem_classes=["primary-btn"])
-                                                redirect_btn = gr.Button("Book Now", elem_classes=["primary-btn"], interactive=False, visible=False)  # ADDED: visible=False initially
+                                                redirect_btn = gr.Button("Book Now", elem_classes=["primary-btn"], interactive=False, visible=False)
                                             result = gr.Markdown(label=f"Booking Result {i+1}", show_label=False)
-                                            booking_url = gr.State("")
+                                            # Use hidden Textbox instead of State
+                                            booking_url = gr.Textbox(
+                                                value="",
+                                                visible=False,  # Hidden in UI
+                                                elem_id=f"booking_url_{i}",  # Unique ID for JS
+                                                show_label=False
+                                            )
                                         
                                             info_mds.append(info_md)
                                             booking_buttons.append(btn)
@@ -707,64 +713,63 @@ def create_travel_app():
                                                 fn=create_booking_handler(i),
                                                 inputs=booking_data_state,
                                                 outputs=[booking_results[i], redirect_buttons[i], booking_urls[i]]
-                                            )
-
+                                            ).then(
+                                                fn=lambda url: gr.Info(f"Booking URL generated: {url}") if url else None,
+                                                inputs=booking_urls[i],
+                                                outputs=None
+                                            )  # Debug: Show URL in Gradio notification
+                                        
                                             # Redirect button click - open URL in new tab
                                             redirect_btn.click(
-                                                fn=None,  # No Python function needed
+                                                fn=None,
                                                 inputs=booking_urls[i],
                                                 outputs=None,
-                                                js="""(url) => {
+                                                js=f"""(url) => {{
                                                     console.log('Redirect clicked, URL:', url);
                                                     
-                                                    if (!url || url === '') {
+                                                    if (!url || url === '') {{
                                                         console.error('No URL provided to redirect');
                                                         alert('No booking URL available. Please try clicking Book again.');
                                                         return;
-                                                    }
-                                                    
-                                                    if (url.includes('|')) {
-                                                        // Parse combined URL string (round-trip with separate tickets)
+                                                    }}
+                                                    if (url.includes('|')) {{
                                                         console.log('Processing combined URLs (separate tickets)');
                                                         const parts = url.split('|');
                                                         let urlsOpened = 0;
-                                                        
-                                                        parts.forEach((part, index) => {
-                                                            console.log(`Processing part ${index}:`, part);
+                                                        parts.forEach((part, index) => {{
+                                                            console.log(`Processing part ${{index}}:`, part);
                                                             const colonIndex = part.indexOf(':');
-                                                            if (colonIndex !== -1) {
+                                                            if (colonIndex !== -1) {{
                                                                 const link = part.substring(colonIndex + 1).trim();
                                                                 console.log('Extracted link:', link);
-                                                                if (link && link.startsWith('http')) {
+                                                                if (link && link.startsWith('http')) {{
                                                                     const opened = window.open(link, '_blank', 'noopener,noreferrer');
-                                                                    if (opened) {
+                                                                    if (opened) {{
                                                                         urlsOpened++;
-                                                                        console.log(`Successfully opened URL ${urlsOpened}`);
-                                                                    } else {
+                                                                        console.log(`Successfully opened URL ${{urlsOpened}}`);
+                                                                    }} else {{
                                                                         console.error('Failed to open URL - popup blocked?');
-                                                                    }
-                                                                }
-                                                            }
-                                                        });
-                                                        
-                                                        if (urlsOpened === 0) {
+                                                                    }}
+                                                                }}
+                                                            }}
+                                                        }});
+                                                        if (urlsOpened === 0) {{
                                                             alert('Failed to open booking URLs. Please check your popup blocker.');
-                                                        }
-                                                    } else if (url.startsWith('http')) {
-                                                        // Single URL
+                                                        }}
+                                                    }} else if (url.startsWith('http')) {{
                                                         console.log('Opening single URL:', url);
                                                         const opened = window.open(url, '_blank', 'noopener,noreferrer');
-                                                        if (!opened) {
+                                                        if (!opened) {{
                                                             console.error('Failed to open URL - popup blocked?');
                                                             alert('Failed to open booking URL. Please check your popup blocker.');
-                                                        } else {
+                                                        }} else {{
                                                             console.log('Successfully opened booking URL');
-                                                        }
-                                                    } else {
+                                                        }}
+                                                    }} else {{
                                                         console.error('Invalid URL format:', url);
                                                         alert('Invalid booking URL format. Please try again.');
-                                                    }
-                                                }"""
+                                                    }}
+                                                }}"""
                                             )
                                         booking_groups.append(group)
 

@@ -68,6 +68,7 @@ def book_flight(post_data: str, booking_phone: str) -> dict:
         if response.status_code == 200:
             redirect_url = extract_redirect_url(response.text)
             if redirect_url:
+                print(f"Redirect URL: {redirect_url}")
                 return {"success": True, "url": redirect_url, "message": "Booking request processed successfully!"}
             else:
                 return {"success": False, "url": None, "message": "Failed to extract redirect URL from response."}
