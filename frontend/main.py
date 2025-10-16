@@ -3,8 +3,7 @@ from frontend.utils import book_flight
 from frontend.components.ui_manager import UIManager
 from backend.agents.travel_agent import TravelAgent
 from backend.transcript.main import AssemblyAITranscriber
-import asyncio  # NEW: Import asyncio for handling async init
-import re
+from frontend.utils import ordinal
 
 MAX_FLIGHTS = 20
 MAX_BOOKING_OPTIONS = 10
@@ -451,6 +450,7 @@ def create_travel_app():
             print('\n'*5)
             print(f"option index: {option_index}")
             print('\n'*5)
+            gr.Info(f"Processing booking for {ordinal(option_index + 1)} option...")
             booking_options = booking_data.get("booking_options", []) if booking_data else []
             if option_index >= len(booking_options):
                 return "⚠️ Invalid option", ""
@@ -501,12 +501,18 @@ def create_travel_app():
             # Show "Finalise Flight" button, hide "Get Return Flights" button
             return gr.update(visible=True), gr.update(visible=False)
     
-    def complete_reset():
-        """ Complete reset of all states and UI components """
-
-        # Reset all state variables
+    def reset_chatbot():
+        """ Reset all chatbot-related states and UI components """
         new_thread_id = travel_agent.make_thread_id()
-        
+        return (
+            "",  # message
+            [],  # chatbot
+            new_thread_id,  # thread_id_state
+            False  # is_recording
+        )
+
+    def reset_flight_section():
+        """ Reset all flight section-related states and UI components """
         # Create empty card updates
         empty_card_html = [""] * MAX_FLIGHTS
         hidden_card_containers = [gr.update(visible=False)] * MAX_FLIGHTS
@@ -519,12 +525,6 @@ def create_travel_app():
         empty_booking_urls = [""] * MAX_BOOKING_OPTIONS
         
         return (
-            # Basic inputs/outputs
-            "",  # message
-            [],  # chatbot
-            new_thread_id,  # thread_id_state
-            False, # is_recording
-            
             # State variables
             VIEW_OUTBOUND_CARDS,  # current_view
             {},  # initial_flight_payload
@@ -563,8 +563,14 @@ def create_travel_app():
             *empty_booking_urls, # booking_urls content
             gr.update(visible=False),  # loader_group
             gr.update(value=""),  # loader_message
-            gr.update(visible=False),  # error_message
+            gr.update(visible=False)  # error_message
         )
+
+    def complete_reset():
+        """ Complete reset of all states and UI components by calling modular reset functions """
+        chatbot_outputs = reset_chatbot()
+        flight_outputs = reset_flight_section()
+        return (*chatbot_outputs, *flight_outputs)
 
     with gr.Blocks(theme=gr.themes.Default(primary_hue="emerald"), css=CSS) as demo:
         gr.Markdown("Enter your travel query")
@@ -708,6 +714,10 @@ def create_travel_app():
                                             )
                                         booking_groups.append(group)
 
+                            with gr.Column(elem_classes=["flight-buttons"]):
+                                with gr.Row(elem_classes=["button-row"]):
+                                    booking_done_button = gr.Button("Done", elem_id="confirm-button")
+
         with gr.Group():
             with gr.Row():
                 message = gr.Textbox(show_label=False, placeholder="Enter your travel query", scale=5)
@@ -722,8 +732,8 @@ def create_travel_app():
             inputs=[is_recording, message],
             outputs=[is_recording, message, mic_button]
         )
-        
 
+        
         # (0) user clicks on "go" button or "enter" inside the textbox -> message is processed and flight cards are shown if available
         message.submit(
             fn=lambda: (gr.update(visible=True), gr.update(value="Fetching outbound flights..."), gr.update(visible=False)),
@@ -964,6 +974,44 @@ def create_travel_app():
             inputs=current_view,
             outputs=[outbound_flight_cards, return_flight_cards, outbound_flight_details, return_flight_details, flight_booking_section]
         )
+
+        # (12) user clicks on "done" button in booking section -> reset entire flight section
+        booking_done_button.click(
+            fn=reset_flight_section,
+            outputs=[
+                current_view,
+                initial_flight_payload,
+                outbound_flights_state,
+                selected_outbound_index,
+                return_flights_state,
+                selected_return_index,
+                booking_data_state,
+                flight_section,
+                *outbound_card_html_components,
+                *outbound_card_containers,
+                outbound_view_flight_button,
+                outbound_flight_details_box,
+                outbound_booking_options_button,
+                get_return_flights_button,
+                *return_card_html_components,
+                *return_card_containers,
+                return_view_flight_button,
+                return_flight_details_box,
+                *booking_groups,
+                *info_mds,
+                *booking_buttons,
+                *booking_results,
+                *booking_urls,
+                loader_group,
+                loader_message,
+                error_message
+            ]
+        ).then(
+            fn=UIManager.update_view,
+            inputs=current_view,
+            outputs=[outbound_flight_cards, return_flight_cards, outbound_flight_details, return_flight_details, flight_booking_section]
+        )
+
         demo.load(init_chat, inputs=thread_id_state, outputs=chatbot)
 
     return demo
