@@ -94,6 +94,7 @@ def build_details(index: Optional[int], flights: List[Dict]) -> str:
     details += f"**Carbon Emissions:** {carbon.get('this_flight', 'N/A')} g (vs {carbon.get('typical_for_this_route', 'N/A')}; difference: {carbon.get('difference_percent', 'N/A')}%) <br>"
 
     for i, f in enumerate(flight.get("flights", []), 1):
+        details += "\n"
         details += f"### Leg {i}\n"
         dep = f.get('departure_airport', {})
         arr = f.get('arrival_airport', {})
