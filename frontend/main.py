@@ -6,7 +6,7 @@ from backend.transcript.main import AssemblyAITranscriber
 from frontend.utils import ordinal
 
 MAX_FLIGHTS = 20
-MAX_BOOKING_OPTIONS = 10
+MAX_BOOKING_OPTIONS = 20
 VIEW_OUTBOUND_CARDS = "outbound cards"
 VIEW_RETURN_CARDS = "return cards"
 VIEW_OUTBOUND_DETAILS = "outbound details"
@@ -14,18 +14,42 @@ VIEW_RETURN_DETAILS = "return details"
 VIEW_BOOKING = "booking"
 
 CSS = """
-/* Dark theme variables matching Gradio's dark mode */
+/* Base styles (light theme variables - default for light mode or unspecified preference) */
 :root {
-    --flight-bg: #0b0f19;
-    --flight-surface: #1a1d29;
-    --flight-surface-hover: #252837;
-    --flight-border: #374151;
-    --flight-text: #f9fafb;
-    --flight-text-secondary: #d1d5db;
-    --flight-accent: #10b981;
-    --flight-accent-hover: #059669;
-    --flight-error: #ef4444;
-    --flight-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    --flight-bg: #ffffff; /* Light background */
+    --flight-surface: #f9fafb; /* Light surface */
+    --flight-surface-hover: #f3f4f6; /* Light hover */
+    --flight-border: #d1d5db; /* Light border */
+    --flight-text: #111827; /* Dark text for readability */
+    --flight-text-secondary: #6b7280; /* Medium gray text */
+    --flight-accent: #10b981; /* Emerald accent (unchanged) */
+    --flight-accent-hover: #059669; /* Emerald hover (unchanged) */
+    --flight-error: #ef4444; /* Red error (unchanged) */
+    --flight-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* Lighter shadow */
+}
+
+/* Dark theme override */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --flight-bg: #0b0f19;
+        --flight-surface: #1a1d29;
+        --flight-surface-hover: #252837;
+        --flight-border: #374151;
+        --flight-text: #f9fafb;
+        --flight-text-secondary: #d1d5db;
+        --flight-accent: #10b981;
+        --flight-accent-hover: #059669;
+        --flight-error: #ef4444;
+        --flight-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+}
+
+/* Respect reduced motion for animations/transitions */
+@media (prefers-reduced-motion: reduce) {
+    .card-container, #confirm-button, .primary-btn, .secondary-btn {
+        transition: none !important;
+        transform: none !important;
+    }
 }
 
 /* Flight section container - dark theme like chatbot */
@@ -386,6 +410,11 @@ CSS = """
         min-height: calc(80vh - 120px) !important;
         padding: 1rem !important;
     }
+}
+
+/* Ensure Gradio's base elements adapt minimally */
+.gradio-container {
+    color-scheme: light dark; /* Tells browser to allow both schemes */
 }
 """
 

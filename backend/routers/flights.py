@@ -26,7 +26,7 @@ SERPAPI_PARAMETERS = {
     'hl': 'en',
     'gl': 'in',
     'currency': 'INR',
-    'deep_research': True
+    'deep_search': 'true'
 }
 
 class FlightsInput(BaseModel):

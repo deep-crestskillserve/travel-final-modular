@@ -1,0 +1,90 @@
+{
+    "search_metadata": {
+        "id": "68f1c1515922f453603f51b8",
+        "status": "Success",
+        "json_endpoint": "https://serpapi.com/searches/8e748401c038d36b/68f1c1515922f453603f51b8.json",
+        "created_at": "2025-10-17 04:08:49 UTC",
+        "processed_at": "2025-10-17 04:08:49 UTC",
+        "google_flights_url": "https://www.google.com/travel/flights?hl=en&gl=in&curr=INR&tfs=CBwQAho_EgoyMDI1LTExLTE4Ih8KA0hZRBIKMjAyNS0xMS0xOBoDU1RWKgI2RTIDOTI4agcIARIDSFlEcgcIARIDU1RWQggBAQEBAQEBAUgBcAGYAQI&tfu=EgIIAQ",
+        "raw_html_file": "https://serpapi.com/searches/8e748401c038d36b/68f1c1515922f453603f51b8.html",
+        "prettify_html_file": "https://serpapi.com/searches/8e748401c038d36b/68f1c1515922f453603f51b8.prettify",
+        "total_time_taken": 1.88
+    },
+    "search_parameters": {
+        "engine": "google_flights",
+        "hl": "en",
+        "gl": "in",
+        "type": "2",
+        "departure_id": "HYD",
+        "arrival_id": "STV",
+        "outbound_date": "2025-11-18",
+        "adults": 8,
+        "children": 0,
+        "booking_token": "WyJDalJJTURGU04yVk9RWEV6VVRoQlFtOXlXa0ZDUnkwdExTMHRMUzB0TFdWbWJua3lNa0ZCUVVGQlIycDRkMDlaVGs1SWJHVkJFZ1UyUlRreU9Cb0xDS2l5QWhBQUdnTkpUbEk0SEhDYjNBST0iLFtbIkhZRCIsIjIwMjUtMTEtMTgiLCJTVFYiLG51bGwsIjZFIiwiOTI4Il1dXQ==",
+        "currency": "INR"
+    },
+    "selected_flights": [
+        {
+            "flights": [
+                {
+                    "departure_airport": {
+                        "name": "Rajiv Gandhi International Airport",
+                        "id": "HYD",
+                        "time": "2025-11-18 06:05"
+                    },
+                    "arrival_airport": {
+                        "name": "Surat International Airport",
+                        "id": "STV",
+                        "time": "2025-11-18 07:50"
+                    },
+                    "duration": 105,
+                    "airplane": "Airbus A320neo",
+                    "airline": "IndiGo",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/6E.png",
+                    "travel_class": "Economy",
+                    "flight_number": "6E 928",
+                    "legroom": "28 in",
+                    "extensions": [
+                        "Below average legroom (28 in)",
+                        "Carbon emissions estimate: 515 kg"
+                    ]
+                }
+            ],
+            "total_duration": 105,
+            "carbon_emissions": {
+                "this_flight": 515000,
+                "typical_for_this_route": 524000,
+                "difference_percent": -2
+            },
+            "type": "One way",
+            "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/6E.png"
+        }
+    ],
+    "baggage_prices": {
+        "together": [
+            "1 free carry-on",
+            "1st checked bag free"
+        ]
+    },
+    "booking_options": [
+        {
+            "together": {
+                "book_with": "IndiGo",
+                "airline_logos": [
+                    "https://www.gstatic.com/flights/airline_logos/70px/6E.png"
+                ],
+                "marketed_as": [
+                    "6E 928"
+                ],
+                "baggage_prices": [
+                    "1 free carry-on",
+                    "1st checked bag free"
+                ],
+                "booking_request": {
+                    "url": "https://www.google.com/travel/clk/f",
+                    "post_data": "u=ADowPOKPazGcgy--oggE5T3EKlUB78YTSbXlKP53oLepVgpEZErzLrOHWxOOroLNSrfz1TqmLGZsWR3TUNlt8_dXAXLjP4nkcyX6lefyUvoPN9Vib299ZritAwkuCtU0aox45iZw8376uqP99yxYcMuPhc2ip8k_P8shXjLjsdQSIquwqDy2NH4ZQPZQ3825ibUNNXM8hEyxRSBN54eE2lPp8aPg5dt_IrZN-h7xSPmvA7NYM8qvIKcf1RynPb9x4OYw3WFp8rKH-Q-UqEQWyF6Lkv7GOaApQs7bHRZfpeXs44Bz41lL_-56OfqvxoRXPtUW-zxOrUF_7fTHQ2AtHa_aido_zlcwuWu08nCo3nQfTawnNy9c-7TDjPA58h9EoPHkv8xWXYGyqmSqc0N5p6t9RWon1s7gLdgJo2Qz9YR8Y9Ldi0-_7ZNGAqtet95uyJWyEZO8dZNVn-Cf1-9i3gF5V85cynOWxeg2qonktmDWdtIWEgLtg28rIzpp72s0QU18OKCnXTiLg1ZMpENLc5oOm6XmvMhWImVChU3f5k1NVmUEPLhN64y1v-0m46zfywUwFo5lmQxfVyU_28ymogQpIHXX7LNIYfu8UuuDngFfoy1XQDZCrPQy6ttpNcPBZWhhHuB_cAQJBoLem_1MDIR5oqSWRlWv5ZI2d9pJy8txqYDmLY3Ix9O5Nj9QyWCDXFwfmgNdK3lPc8lYVSvlWV4clbPD-jziU0gXLdmL4O-yf3vxklVssILvuO3sRxqjUoqDLF0nnehUEXknoF48ou7XuqXRtPfUR8GUh1p7vl_EXUpjymc79pH8PFV6p9uTL9KMCeojdsBuGC7Zqv6yZVOPSev2a4WTr8uN9E4zOPsOEaUCqm8iPPpLmKqoDMXy5QKGuiyX5rUWo-Tpifi-N4Su7uK65uQgPF-E6HQyP0JSYXlQDJOK53cyUqny1CfFJQ0LruYHTNJvpMH5hXfAjCf4XbZQMW-D8rKyWjdQvHsn2CoCNs8cHge0nENad_D1jYpmsuwndW6YU8wMhicsvrXZHp1Cg-lR_BLI-NBlRCvVhxlzncXwes1rdKYlpISQBLUSEBtccEZ9y1eCXUQzC55SReXOE011dsVrUid0saj9CQNRhkkmTQXfPuFyvxoLmhm2UprES5JJjz1zGPk2AINvOm-ve6JxHPAdh9Z2gcaKBaZW1Pg0pJRvxqPsxZ4Emz_6_E1aYY7UvXG6r2W_odwsKdFPXN5RnjyukMq6-6f424FOqTHaoN0tGZnRT21zzg988C87dl5tXhk1FG6MpHBLfInqV6J9-swEFiMYFc8WWjTGyZwHJZr4Kc2cQIlZSI2zQEpjm8GGBJs2ZRsm9NTYGCv9_QF3dcokoqO4aKwjgyO8qk7MSovc-BAcJnxyv8RlI-BdMxn0RMTxHKXDUGGXW76H90Yb65isreJk_tpMlpo3L9tJ8o8paWcSlCB8JnIY9_hvuyiL5OMgSz8g4ayenze3i9Uj7O_UFPrk519O5m1xrLPT-ckXnqPSud82AIVOD_8no-v4JwvrOGT5VP96G4g4dY-rHdnQolwYVbfa_0tjbo5kpQzLRLSu8r7uGJzJuG7fOGjgWzHXmYEQheTCHRwRsB54RWrkkIKb2X_Xmv6UAbH9m0qPOk4hGwuEQ8IWnYZHGmITFa9livq7L5LYPnabM-dgdAmk8OohPiLoplAoa5OuW8G5WBSnsPUpjiLjg8NCUMF71MPlOCXgn-J-7PyQH5lH3lVJf-EicGqsn4UkYAW5lJOgViRnJb5WaixLX7RPXqBOFTguOnrc5AbVzZEs-hx1ojFICpRpgVgt_-hgYqESqsl5JGzQL1d1EFkGoPzboH2wBMLhMGEJq8Gwhm5FGl9B4uPsywL4aVfkmriptyKqso9NTx5xd0HCit67bDtE5wSiVJr1SvHQTNbVj3BgYpgjR5CrUSNypIxXRLw3wSl6Nmp-yWSYiIqdWZ6rZPN7P61RJm2fsxvmLkQXUyofTebZqN3z9Lrn57th_R13AvhTIT6MP0lkTflIIcGiT7foKNTlxmlEiEZQKBednVV5FU_TkpfeICowfQH-BoaDf9jostCsIRzwyFb114lFoI3nLE0OJJhP43Od55ypz0rOO-06BJN1CX2FjApyPs4Mvp0J5gnolibjlofxL-y_TWHpnGRf4OuID9FQX51gvqsBdkb4Xtn6Wp_YMfGlwP9m5n9opvsH4lwSToOTIImQEuKcxfOa93RnWj1MojhKCt_J7tFNtmN9DTN_T3W27MjlYpEpXhtDPc39ngEgl4eYtv1q9l1zj0qZDBZPwaEm-O1wIdmMZ3CXCAxagjey7RTAIAhMps6HR_5kHN-982QvqKJgHBGnjPZS896SGTa9IclYX2n9ZJ9pxO93ldNFJ6xO9Ub6Zt35X4ptXldkmA3JV1m3WvFYKfbJ7UDfJVqooHpGnQL-d2COqbQ-E66NqO7grcUuZF7pST2MNoNxcQo4Ey48emckyHIqJ-9kTJKUFaLBqgBsZiVpGfsDPdk6ECMfxX76eMXV34sqIAXJ8J6NeVt6XjjXAmUYGOIde0VDv7Ot5hgchM75N6fNhEggbkQ30FIdwE3Wc6vOyEkzDAK7ySylP2mSZejVoo9fQ1ok1QTivskQ0lw2rfN049bf2DElexunAq_0OQi3H2SXZl-NicihziZxvapsgjGDPCovxLp7tHCEuzFVIFVG1gLvyUglBRfWwO2Scq299jnz98KpRQt2txI0fDluu0V6l54caqmXYwh45IJjcHv5_nYYDS0uDuRT43JV1V7Ktobu4hvgcUwQaQfl8F_4dhi03EF0fbp-nxkG_onuiczMhMqcnzW1sE_RN21iJ2CJ9qZtmhiH5VWFTjdpU9qr9Jzi_mTCPgHzKCWQLTls8VMdHytmq6eGDLnVXovO0RmwaGM6Ie4O0_vXEoDApRbOYGebsy-dejFFbhbHSY5S7VYMXpOt_E05WGgTxWMSXiIK1FZuvb7fBWLJyfqwTzlAUxVuxN9zEZT2hm-d8xZWgxAfI7Sug7mNYMSJthe-eh8HNiLcZjfnCijz066Cc_GmJbl90DPuRa-BgoA6gmuEbaCj6vzxpskLgq2HFn6eGfJIpO7kfxm8-Wzyk-Ba8GKHidflE8FRdm4E8j49OSyHMzwlfQ2z2yawR1lhZpoDVYW9r34Eynj-FdoPusbAiU4KXXHRQJj46Gb4NOaocaFNQKzb4w3dBSmH2hZUtrSZTFnJzWmMD35o6sqo29r3E-2wNNRoAcyQiX82wxUrZ-igu2Fb1XcHIGVkJgUquMCqHYnKLJN15slK-o88aUxPKFAK3OpN0zsfW8af4vCWR2IZV4vf767QXD_7MPvFq0u5"
+                }
+            }
+        }
+    ]
+}

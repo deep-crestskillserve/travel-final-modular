@@ -7,7 +7,7 @@ from frontend.utils import format_duration, build_details, ordinal
 logger = get_logger()
 
 MAX_FLIGHTS = 20
-MAX_BOOKING_OPTIONS = 10
+MAX_BOOKING_OPTIONS = 20
 VIEW_OUTBOUND_CARDS = "outbound cards"
 VIEW_RETURN_CARDS = "return cards"
 VIEW_OUTBOUND_DETAILS = "outbound details"
@@ -95,6 +95,17 @@ class UIManager:
         logger.info(f"Loading booking options...")
         # logger.info("Booking data received", extra={"extra_data": booking_data})
         booking_options = booking_data.get("booking_options", []) if booking_data else []
+
+        # 🟢 Sort booking options by price ascending, keeping 'N/A' last
+        def safe_price(option):
+            price = option.get("together", {}).get("price", "N/A")
+            try:
+                return float(price)
+            except (ValueError, TypeError):
+                return float('inf')
+
+        booking_options = sorted(booking_options, key=safe_price)
+
         booking_groups_updates = []
         info_md_updates = []
         booking_button_updates = []
@@ -108,6 +119,7 @@ class UIManager:
                 currency = booking_data.get("search_parameters", {}).get("currency", "INR") if booking_data else "INR"
                 flight_numbers = ', '.join(option.get("marketed_as", []))
                 single_ticket = "together" in booking_data.get("baggage_prices", {})
+
                 if single_ticket:
                     baggage_data = booking_data.get("baggage_prices", {})
                     together = baggage_data.get("together", [])
@@ -117,6 +129,7 @@ class UIManager:
                     departing = baggage_data.get("departing", [])
                     returning = baggage_data.get("returning", [])
                     baggage = ', '.join(departing) + " | " + ', '.join(returning)
+
                 info = (
                     f"### Option {i+1}: {book_with}<br>"
                     f"Price: {price} {currency}<br>"
@@ -134,6 +147,7 @@ class UIManager:
                 booking_url_updates.append("")
         
         return (booking_groups_updates + info_md_updates + booking_button_updates + booking_url_updates)
+
     
     @staticmethod
     def get_flight_details(selected: int, flight_data: Dict, params: Dict):
