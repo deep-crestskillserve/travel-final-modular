@@ -617,6 +617,32 @@ def create_travel_app():
         flight_outputs = reset_flight_section()
         return (*chatbot_outputs, *flight_outputs)
 
+    def handle_new_flight_data(flights_state, payload_state):
+        """
+        Check if new flights were fetched. If yes, reset flight section and return new data.
+        Otherwise, return unchanged states.
+        """
+        has_new_flights = bool(flights_state.get("flights"))
+        
+        if has_new_flights:
+            # Reset everything and update with new flight data
+            reset_outputs = reset_flight_section()
+            # Override the states that need new data
+            return (
+                VIEW_OUTBOUND_CARDS,  # current_view
+                payload_state,  # initial_flight_payload (NEW)
+                flights_state,  # outbound_flights_state (NEW)
+                *reset_outputs[3:]  # Rest of the reset outputs (selected indices, return flights, booking data, UI components)
+            )
+        else:
+            # No new flights, return no-change updates
+            return (
+                gr.State(),  # current_view - no change
+                gr.State(),  # initial_flight_payload - no change
+                gr.State(),  # outbound_flights_state - no change
+                *([gr.State()] * (len(reset_flight_section()) - 3))  # Rest unchanged
+            )
+
     with gr.Blocks(theme=gr.themes.Default(primary_hue="emerald"), css=CSS) as demo:
         gr.Markdown("Enter your travel query")
         
@@ -797,6 +823,38 @@ def create_travel_app():
             inputs=[user_message_state, chatbot, thread_id_state],
             outputs=[chatbot, outbound_flights_state, initial_flight_payload]
         ).then(
+            # NEW: Handle potential flight section reset if new flights were fetched
+            fn=handle_new_flight_data,
+            inputs=[outbound_flights_state, initial_flight_payload],
+            outputs=[
+                current_view,
+                initial_flight_payload,
+                outbound_flights_state,
+                selected_outbound_index,
+                return_flights_state,
+                selected_return_index,
+                booking_data_state,
+                flight_section,
+                *outbound_card_html_components,
+                *outbound_card_containers,
+                outbound_view_flight_button,
+                outbound_flight_details_box,
+                outbound_booking_options_button,
+                get_return_flights_button,
+                *return_card_html_components,
+                *return_card_containers,
+                return_view_flight_button,
+                return_flight_details_box,
+                *booking_groups,
+                *info_mds,
+                *booking_buttons,
+                *booking_results,
+                *booking_urls,
+                loader_group,
+                loader_message,
+                error_message
+            ]
+        ).then(
             fn=lambda view, data: gr.update(visible=True, value=data.get("error", "")) if data.get("error") else gr.update(visible=False),
             inputs=[current_view, outbound_flights_state],
             outputs=error_message
@@ -809,10 +867,14 @@ def create_travel_app():
             inputs=initial_flight_payload,
             outputs=[outbound_booking_options_button, get_return_flights_button]
         ).then(
+            fn=UIManager.update_view,
+            inputs=current_view,
+            outputs=[outbound_flight_cards, return_flight_cards, outbound_flight_details, return_flight_details, flight_booking_section]
+        ).then(
             fn=lambda: (gr.update(visible=False), gr.update(value="")),
             outputs=[loader_group, loader_message]
         ).then(
-            fn=lambda: (gr.update(value=""), gr.update(value="")),  # message, user_message_state
+            fn=lambda: (gr.update(value=""), gr.update(value="")),
             outputs=[message, user_message_state]
         )
 
@@ -832,6 +894,38 @@ def create_travel_app():
             inputs=[user_message_state, chatbot, thread_id_state],
             outputs=[chatbot, outbound_flights_state, initial_flight_payload]
         ).then(
+            # NEW: Handle potential flight section reset if new flights were fetched
+            fn=handle_new_flight_data,
+            inputs=[outbound_flights_state, initial_flight_payload],
+            outputs=[
+                current_view,
+                initial_flight_payload,
+                outbound_flights_state,
+                selected_outbound_index,
+                return_flights_state,
+                selected_return_index,
+                booking_data_state,
+                flight_section,
+                *outbound_card_html_components,
+                *outbound_card_containers,
+                outbound_view_flight_button,
+                outbound_flight_details_box,
+                outbound_booking_options_button,
+                get_return_flights_button,
+                *return_card_html_components,
+                *return_card_containers,
+                return_view_flight_button,
+                return_flight_details_box,
+                *booking_groups,
+                *info_mds,
+                *booking_buttons,
+                *booking_results,
+                *booking_urls,
+                loader_group,
+                loader_message,
+                error_message
+            ]
+        ).then(
             fn=lambda view, data: gr.update(visible=True, value=data.get("error", "")) if data.get("error") else gr.update(visible=False),
             inputs=[current_view, outbound_flights_state],
             outputs=error_message
@@ -844,10 +938,14 @@ def create_travel_app():
             inputs=initial_flight_payload,
             outputs=[outbound_booking_options_button, get_return_flights_button]
         ).then(
+            fn=UIManager.update_view,
+            inputs=current_view,
+            outputs=[outbound_flight_cards, return_flight_cards, outbound_flight_details, return_flight_details, flight_booking_section]
+        ).then(
             fn=lambda: (gr.update(visible=False), gr.update(value="")),
             outputs=[loader_group, loader_message]
         ).then(
-            fn=lambda: (gr.update(value=""), gr.update(value="")),  # message, user_message_state
+            fn=lambda: (gr.update(value=""), gr.update(value="")),
             outputs=[message, user_message_state]
         )
         
