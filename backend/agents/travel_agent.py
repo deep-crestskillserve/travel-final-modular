@@ -80,7 +80,7 @@ class TravelAgent:
 
     async def process_message(self, message: str, history: List, thread: str) -> Tuple[List, Dict, Dict]:
         """ Process a user message and return updated history, flight data and original params """
-        if not message and not history:
+        if not message.strip() and len(history) == 0:
             initial_content = "Hello! Welcome to our travel chatbot. I'm here to help you find and book the perfect flights. Where would you like to go?"
             history = [{"role": "assistant", "content": initial_content}]
             return history, {}, None
@@ -89,16 +89,26 @@ class TravelAgent:
         # Get previous state to determine the length of existing messages
         previous_state = self.graph.get_state(config)
         previous_messages_len = len(previous_state.values.get("messages", [])) if previous_state and previous_state.values else 0
+        
+        # Append user to history if not already present (avoids duplicates when UI pre-adds it)
+        if len(history) == 0 or not (
+            history[-1].get("role") == "user" and 
+            history[-1].get("content") == message
+        ):
+            user = {"role": "user", "content": message}
+            history = history + [user]
+        
         # As the accumulator is add_message, the state message will be updated automatically
         state = State(messages=[HumanMessage(content=message)])
         try:
             result = await self.graph.ainvoke(state, config=config)
         except Exception as e:
             print(f"Graph error: {e}")
-            return history + [{"role": "assistant", "content": f"System error: {str(e)}"}], {"error": str(e)}, None
+            # Append error to history (which already has user)
+            error_reply = {"role": "assistant", "content": f"System error: {str(e)}"}
+            history = history + [error_reply]
+            return history, {"error": str(e)}, None
         
-        user = {"role": "user", "content": message}
-        history = history + [user]
         ai_msg = result["messages"][-1]
         reply = {"role": "assistant", "content": ai_msg.content}
         history = history + [reply]

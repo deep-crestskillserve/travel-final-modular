@@ -552,7 +552,8 @@ def create_travel_app():
             "",  # message
             [],  # chatbot
             new_thread_id,  # thread_id_state
-            False  # is_recording
+            False,  # is_recording
+            ""  # user_message_state
         )
 
     def reset_flight_section():
@@ -620,6 +621,7 @@ def create_travel_app():
         gr.Markdown("Enter your travel query")
         
         thread_id_state = gr.State(travel_agent.make_thread_id())
+        user_message_state = gr.State("")
         
         current_view = gr.State(value=VIEW_OUTBOUND_CARDS)
         initial_flight_payload = gr.State(value={})
@@ -780,11 +782,19 @@ def create_travel_app():
         
         # (0) user clicks on "go" button or "enter" inside the textbox -> message is processed and flight cards are shown if available
         message.submit(
-            fn=lambda: (gr.update(visible=True), gr.update(value="Fetching outbound flights..."), gr.update(visible=False)),
-            outputs=[loader_group, loader_message, error_message]
+            fn=lambda msg, hist: (
+                msg,  # user_message_state
+                hist + [{"role": "user", "content": msg}],  # chatbot (append user immediately)
+                "",  # message (clear input)
+                gr.update(visible=True),  # loader_group
+                gr.update(value="Fetching outbound flights..."),  # loader_message
+                gr.update(visible=False)  # error_message
+            ),
+            inputs=[message, chatbot],
+            outputs=[user_message_state, chatbot, message, loader_group, loader_message, error_message]
         ).then(
             fn=travel_agent.process_message,
-            inputs=[message, chatbot, thread_id_state],
+            inputs=[user_message_state, chatbot, thread_id_state],
             outputs=[chatbot, outbound_flights_state, initial_flight_payload]
         ).then(
             fn=lambda view, data: gr.update(visible=True, value=data.get("error", "")) if data.get("error") else gr.update(visible=False),
@@ -802,16 +812,24 @@ def create_travel_app():
             fn=lambda: (gr.update(visible=False), gr.update(value="")),
             outputs=[loader_group, loader_message]
         ).then(
-            fn=lambda: gr.update(value=""),
-            outputs=message
+            fn=lambda: (gr.update(value=""), gr.update(value="")),  # message, user_message_state
+            outputs=[message, user_message_state]
         )
 
         go_button.click(
-            fn=lambda: (gr.update(visible=True), gr.update(value="Fetching outbound flights..."), gr.update(visible=False)),
-            outputs=[loader_group, loader_message, error_message]
+            fn=lambda msg, hist: (
+                msg,  # user_message_state
+                hist + [{"role": "user", "content": msg}],  # chatbot (append user immediately)
+                "",  # message (clear input)
+                gr.update(visible=True),  # loader_group
+                gr.update(value="Fetching outbound flights..."),  # loader_message
+                gr.update(visible=False)  # error_message
+            ),
+            inputs=[message, chatbot],
+            outputs=[user_message_state, chatbot, message, loader_group, loader_message, error_message]
         ).then(
             fn=travel_agent.process_message,
-            inputs=[message, chatbot, thread_id_state],
+            inputs=[user_message_state, chatbot, thread_id_state],
             outputs=[chatbot, outbound_flights_state, initial_flight_payload]
         ).then(
             fn=lambda view, data: gr.update(visible=True, value=data.get("error", "")) if data.get("error") else gr.update(visible=False),
@@ -829,8 +847,8 @@ def create_travel_app():
             fn=lambda: (gr.update(visible=False), gr.update(value="")),
             outputs=[loader_group, loader_message]
         ).then(
-            fn=lambda: gr.update(value=""),
-            outputs=message
+            fn=lambda: (gr.update(value=""), gr.update(value="")),  # message, user_message_state
+            outputs=[message, user_message_state]
         )
         
         # (1) User clicks on the outbound flights cards -> view flight button becomes interactive
@@ -988,7 +1006,7 @@ def create_travel_app():
             fn=complete_reset,
             outputs=[
                 # Basic inputs/outputs
-                message, chatbot, thread_id_state, is_recording,
+                message, chatbot, thread_id_state, is_recording, user_message_state,
 
                 # State variables
                 current_view, initial_flight_payload, outbound_flights_state,
