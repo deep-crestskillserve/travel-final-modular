@@ -637,9 +637,9 @@ def create_travel_app():
         else:
             # No new flights, return no-change updates
             return (
-                gr.State(),  # current_view - no change
-                gr.State(),  # initial_flight_payload - no change
-                gr.State(),  # outbound_flights_state - no change
+                VIEW_OUTBOUND_CARDS,  # current_view - no change
+                {},  # initial_flight_payload - no change
+                {},  # outbound_flights_state - no change
                 *([gr.State()] * (len(reset_flight_section()) - 3))  # Rest unchanged
             )
 
