@@ -14,21 +14,26 @@ VIEW_RETURN_DETAILS = "return details"
 VIEW_BOOKING = "booking"
 
 CSS = """
-/* Base styles (light theme variables - default for light mode or unspecified preference) */
-:root {
-    --flight-bg: #ffffff; /* Light background */
-    --flight-surface: #f9fafb; /* Light surface */
-    --flight-surface-hover: #f3f4f6; /* Light hover */
-    --flight-border: #d1d5db; /* Light border */
-    --flight-text: #111827; /* Dark text for readability */
-    --flight-text-secondary: #6b7280; /* Medium gray text */
-    --flight-accent: #10b981; /* Emerald accent (unchanged) */
-    --flight-accent-hover: #059669; /* Emerald hover (unchanged) */
-    --flight-error: #ef4444; /* Red error (unchanged) */
-    --flight-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* Lighter shadow */
+/* Light theme variables - explicitly for light mode */
+:root, 
+:root[style*="color-scheme: light"],
+.light {
+    --flight-bg: #f9fafb;
+    --flight-surface: #ffffff;
+    --flight-surface-hover: #f3f4f6;
+    --flight-border: #e5e7eb;
+    --flight-text: #111827;
+    --flight-text-secondary: #6b7280;
+    --flight-accent: #10b981;
+    --flight-accent-hover: #059669;
+    --flight-error: #ef4444;
+    --flight-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --flight-scrollbar-track: #f3f4f6;
+    --flight-scrollbar-thumb: #d1d5db;
+    --flight-scrollbar-thumb-hover: #9ca3af;
 }
 
-/* Dark theme override */
+/* Dark theme variables - for dark mode AND as fallback */
 @media (prefers-color-scheme: dark) {
     :root {
         --flight-bg: #0b0f19;
@@ -41,18 +46,30 @@ CSS = """
         --flight-accent-hover: #059669;
         --flight-error: #ef4444;
         --flight-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        --flight-scrollbar-track: #0b0f19;
+        --flight-scrollbar-thumb: #374151;
+        --flight-scrollbar-thumb-hover: #6b7280;
     }
 }
 
-/* Respect reduced motion for animations/transitions */
-@media (prefers-reduced-motion: reduce) {
-    .card-container, #confirm-button, .primary-btn, .secondary-btn {
-        transition: none !important;
-        transform: none !important;
-    }
+:root[style*="color-scheme: dark"],
+.dark {
+    --flight-bg: #0b0f19;
+    --flight-surface: #1a1d29;
+    --flight-surface-hover: #252837;
+    --flight-border: #374151;
+    --flight-text: #f9fafb;
+    --flight-text-secondary: #d1d5db;
+    --flight-accent: #10b981;
+    --flight-accent-hover: #059669;
+    --flight-error: #ef4444;
+    --flight-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    --flight-scrollbar-track: #0b0f19;
+    --flight-scrollbar-thumb: #374151;
+    --flight-scrollbar-thumb-hover: #6b7280;
 }
 
-/* Flight section container - dark theme like chatbot */
+/* Flight section container */
 #flight-container {
     display: flex !important;
     flex-direction: column !important;
@@ -133,15 +150,18 @@ CSS = """
     font-size: 16px;
     margin-bottom: 4px;
 }
+
 .duration {
     font-size: 14px;
     color: var(--flight-text-secondary) !important;
     margin-bottom: 4px;
 }
+
 .stops {
     font-size: 14px;
     color: var(--flight-text-secondary) !important;
 }
+
 .departure-time {
     font-size: 14px;
     color: var(--flight-text-secondary) !important;
@@ -169,7 +189,7 @@ CSS = """
     overflow: hidden !important;
 }
 
-/* Flight details styling - UPDATED: Ensure consistent padding and reinforce scrollbar */
+/* Flight details styling */
 .flight-details {
     background: var(--flight-surface) !important;
     border: 1px solid var(--flight-border) !important;
@@ -179,7 +199,7 @@ CSS = """
     line-height: 1.6 !important;
     overflow-y: auto !important;
     max-height: 500px !important;
-    min-height: calc(500px - 120px) !important; /* Adjust for button row height */
+    min-height: calc(500px - 120px) !important;
 }
 
 .flight-details h1, .flight-details h2, .flight-details h3 {
@@ -288,7 +308,7 @@ CSS = """
     overflow-y: auto !important;
     overflow-x: hidden !important;
     max-height: 500px !important;
-    min-height: calc(500px - 120px) !important; /* Adjust for button row height */
+    min-height: calc(500px - 120px) !important;
 }
 
 /* Button row styling */
@@ -312,7 +332,7 @@ CSS = """
 .cards-grid::-webkit-scrollbar-track,
 #booking-content::-webkit-scrollbar-track,
 .flight-details::-webkit-scrollbar-track {
-    background: var(--flight-bg) !important;
+    background: var(--flight-scrollbar-track) !important;
     border-radius: 6px !important;
 }
 
@@ -320,21 +340,21 @@ CSS = """
 .cards-grid::-webkit-scrollbar-thumb,
 #booking-content::-webkit-scrollbar-thumb,
 .flight-details::-webkit-scrollbar-thumb {
-    background: var(--flight-border) !important;
+    background: var(--flight-scrollbar-thumb) !important;
     border-radius: 6px !important;
-    border: 2px solid var(--flight-bg) !important;
+    border: 2px solid var(--flight-scrollbar-track) !important;
 }
 
 .flight-content::-webkit-scrollbar-thumb:hover,
 .cards-grid::-webkit-scrollbar-thumb:hover,
 #booking-content::-webkit-scrollbar-thumb:hover,
 .flight-details::-webkit-scrollbar-thumb:hover {
-    background: #6b7280 !important;
+    background: var(--flight-scrollbar-thumb-hover) !important;
 }
 
 #booking-content {
     max-height: 500px !important;
-    min-height: calc(500px - 40px) !important; /* Slight adjustment since no buttons */
+    min-height: calc(500px - 40px) !important;
     overflow-y: auto !important;
     padding: 1rem !important;
 }
@@ -410,11 +430,6 @@ CSS = """
         min-height: calc(80vh - 120px) !important;
         padding: 1rem !important;
     }
-}
-
-/* Ensure Gradio's base elements adapt minimally */
-.gradio-container {
-    color-scheme: light dark; /* Tells browser to allow both schemes */
 }
 """
 
