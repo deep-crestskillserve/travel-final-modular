@@ -73,7 +73,7 @@ travel-git-final-modular/
 
 1. **Clone the repository**
    ```bash
-   git clone [<repository-url>](https://github.com/deep-crestskillserve/travel-final-modular.git)
+   git clone https://github.com/deep-crestskillserve/travel-final-modular.git
    cd travel-git-final-modular
    ```
 
