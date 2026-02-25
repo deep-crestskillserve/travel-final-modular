@@ -74,7 +74,7 @@ travel-git-final-modular/
 1. **Clone the repository**
    ```bash
    git clone https://github.com/deep-crestskillserve/travel-final-modular.git
-   cd travel-git-final-modular
+   cd travel-final-modular
    ```
 
 2. **Install dependencies using uv (recommended)**
