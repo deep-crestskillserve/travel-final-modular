@@ -1,65 +1,75 @@
-# 🛫 Travel Assistant - AI-Powered Flight Booking System
+# Travel Flight Booking Assistant
 
-A sophisticated travel assistant application that combines AI-powered conversation with real-time flight search and booking capabilities. Built with FastAPI backend, Gradio frontend, and integrated with Google Flights API through SerpAPI.
+A modern, AI-powered flight booking application with an intuitive conversational interface. This application uses Google Gemini AI to understand natural language travel queries and helps users search, compare, and book flights through an interactive web interface.
 
-## ✨ Features
+## 🌟 Features
 
-### 🤖 AI-Powered Travel Assistant
-- **Conversational Interface**: Natural language processing for travel queries
-- **Voice Input Support**: Real-time speech-to-text transcription using AssemblyAI
-- **Smart Airport Detection**: Automatic airport code resolution and suggestions
-- **Context-Aware Responses**: Maintains conversation context throughout the booking process
-
-### ✈️ Flight Search & Booking
-- **Real-time Flight Search**: Integration with Google Flights via SerpAPI
-- **One-way & Round-trip**: Support for both travel types
-- **Interactive Flight Cards**: Beautiful, responsive flight selection interface
-- **Detailed Flight Information**: Comprehensive flight details with airline logos, stops, duration
+- **AI-Powered Conversational Interface**: Natural language processing using Google Gemini 2.0 Flash
+- **Voice Input Support**: Real-time voice transcription using AssemblyAI
+- **Flight Search**: Search for one-way and round-trip flights
+- **Airport Discovery**: Intelligent airport lookup with proximity-based suggestions
+- **Interactive UI**: Modern Gradio-based interface with dark/light theme support
+- **Flight Comparison**: View detailed flight information, prices, durations, and stops
 - **Booking Integration**: Direct booking links to partner websites
-
-### 🎨 Modern UI/UX
-- **Dark Theme**: Sleek, modern interface with dark mode styling
-- **Responsive Design**: Optimized for desktop and mobile devices
-- **Interactive Components**: Smooth animations and hover effects
-- **Real-time Updates**: Dynamic UI updates based on user interactions
+- **RESTful API**: FastAPI backend with comprehensive flight search endpoints
+- **Modular Architecture**: Clean separation of concerns with organized codebase
 
 ## 🏗️ Architecture
 
-### Backend (FastAPI)
+The application follows a modular architecture:
+
 ```
-backend/
-├── agents/           # AI agent implementation
-├── routers/          # API endpoints
-├── tools/            # External service integrations
-├── transcript/       # Speech-to-text functionality
-└── utils.py          # Utility functions
+travel-git-final-modular/
+├── backend/          # FastAPI backend with routers, agents, and tools
+├── frontend/         # Gradio-based UI components
+├── shared_utils/     # Shared utilities (logging, data loading)
+└── flight_responses/ # Sample flight data and airport codes
 ```
 
-### Frontend (Gradio)
-```
-frontend/
-├── components/       # UI components and managers
-└── utils.py         # Frontend utilities
-```
+### Components
 
-### Shared Utilities
-```
-shared_utils/
-├── logger.py        # Logging configuration
-└── load_data.py     # Data loading utilities
-```
+- **Backend**: FastAPI application with routers for flights, airports, and geolocation
+- **AI Agent**: LangGraph-based travel agent using Google Gemini
+- **Tools**: Airport lookup and flight search tools integrated with SerpAPI
+- **Frontend**: Gradio interface with voice transcription and interactive flight selection
+- **Transcription**: AssemblyAI integration for voice-to-text conversion
 
-## 🚀 Quick Start
+## 🛠️ Tech Stack
+
+### Core Technologies
+- **Python 3.12+**: Primary programming language
+- **FastAPI**: Modern, fast web framework for building APIs
+- **Gradio**: User-friendly interface for ML applications
+- **LangGraph**: State machine framework for building AI agents
+- **LangChain**: Framework for developing applications with LLMs
+
+### AI & ML
+- **Google Gemini 2.0 Flash**: Large language model for natural language understanding
+- **AssemblyAI**: Real-time speech-to-text transcription
+
+### APIs & Services
+- **SerpAPI**: Google Flights search integration
+- **Google Search Results**: Additional search capabilities
+
+### Dependencies
+- **uvicorn**: ASGI server for FastAPI
+- **httpx**: Async HTTP client
+- **pydantic**: Data validation
+- **python-dotenv**: Environment variable management
+- **pyaudio**: Audio input for voice transcription
+
+## 📦 Installation
 
 ### Prerequisites
-- Python 3.12+
-- UV package manager (recommended) or pip
-- API keys for:
-  - Google Generative AI
-  - SerpAPI
-  - AssemblyAI (for voice features)
 
-### Installation
+- Python 3.12 or higher
+- `uv` package manager (recommended) or `pip`
+- API keys for:
+  - Google Gemini API
+  - SerpAPI
+  - AssemblyAI (for voice transcription)
+
+### Setup Steps
 
 1. **Clone the repository**
    ```bash
@@ -67,170 +77,180 @@ shared_utils/
    cd travel-git-final-modular
    ```
 
-2. **Install dependencies**
+2. **Install dependencies using uv (recommended)**
    ```bash
-   # Using UV (recommended)
    uv sync
-   
-   # Or using pip
-   pip install -r requirements.txt
    ```
 
-3. **Environment Setup**
+   Or using pip:
+   ```bash
+   pip install -e .
+   ```
+
+3. **Set up environment variables**
+   
    Create a `.env` file in the root directory:
    ```env
-   GOOGLE_API_KEY=your_google_api_key
+   google_api_key=your_google_gemini_api_key
    SERPAPI_API_KEY=your_serpapi_key
    ASSEMBLYAI_API_KEY=your_assemblyai_key
    ```
 
-4. **Run the application**
+4. **Verify installation**
    ```bash
-   # Start the backend API
-   python backend/main.py
-   
-   # In another terminal, start the frontend
-   python frontend/main.py
+   python -c "import fastapi, gradio, langchain; print('Dependencies installed successfully!')"
    ```
 
-5. **Access the application**
-   - Frontend: http://localhost:7860
-   - Backend API: http://localhost:8000
+## 🚀 Usage
 
-## 📋 API Endpoints
+### Running the Application
 
-### Flight Search
-- `GET /api/flights/search` - Search for flights
-- `GET /api/airports/search` - Search airports
-- `GET /api/geolocation/search` - Get location information
+1. **Start the FastAPI backend** (in one terminal):
+   ```bash
+   python backend/main.py
+   ```
+   The API will be available at `http://localhost:8000`
 
-### Request Examples
-```python
-# Search for flights
-{
-    "departure_id": "DEL",
-    "arrival_id": "BOM", 
-    "outbound_date": "2024-02-15",
-    "adults": 1,
-    "children": 0
-}
+2. **Start the Gradio frontend** (in another terminal):
+   ```bash
+   python frontend/main.py
+   ```
+   The UI will be available at `http://localhost:7860` (or the URL shown in the terminal)
 
-# Round-trip search
-{
-    "departure_id": "DEL",
-    "arrival_id": "BOM",
-    "outbound_date": "2024-02-15", 
-    "return_date": "2024-02-20",
-    "adults": 1
-}
+### Using the Application
+
+1. **Text Input**: Type your travel query in natural language, e.g.:
+   - "I want to fly from New York to London on March 15th"
+   - "Find flights from Mumbai to Delhi for 2 adults on 2024-12-20"
+   - "Show me round trip flights from Paris to Tokyo leaving on May 1st and returning on May 15th"
+
+2. **Voice Input**: Click the microphone button (🎤) to start voice recording, then click again to stop and transcribe
+
+3. **Flight Selection**: 
+   - Browse available flights in the interactive cards
+   - Click on a flight card to view detailed information
+   - For round trips, select outbound flight first, then return flight
+
+4. **Booking**: 
+   - Click "Finalise Flight" after selecting your preferred flight
+   - Review booking options from different partners
+   - Click "Book" to get redirected to the booking partner's website
+
+## 📡 API Documentation
+
+### FastAPI Endpoints
+
+Once the backend is running, visit `http://localhost:8000/docs` for interactive API documentation.
+
+#### Main Endpoints
+
+- **GET `/api/outbound-flights`**: Search for outbound flights
+  - Query parameters: `departure_id`, `arrival_id`, `outbound_date`, `adults`, `children`, `return_date`
+  
+- **GET `/api/return-flights`**: Search for return flights (round trip)
+  - Query parameters: `departure_id`, `arrival_id`, `outbound_date`, `return_date`, `adults`, `children`, `departure_token`
+  
+- **GET `/api/bookingdata`**: Get booking options for selected flights
+  - Query parameters: `departure_id`, `arrival_id`, `outbound_date`, `adults`, `children`, `return_date`, `booking_token`
+
+- **GET `/api/airports`**: Search for airports by location
+- **GET `/api/geolocation`**: Get geolocation data for locations
+
+### API Workflow
+
+1. **One-Way Flights**:
+   - Call `/api/outbound-flights` → Get `booking_token`
+   - Call `/api/bookingdata` with `booking_token` → Get booking options
+
+2. **Round-Trip Flights**:
+   - Call `/api/outbound-flights` with `return_date` → Get `departure_token`
+   - Call `/api/return-flights` with `departure_token` → Get `booking_token`
+   - Call `/api/bookingdata` with `booking_token` → Get booking options
+
+## 📁 Project Structure
+
 ```
-
-## 🛠️ Technology Stack
-
-### Backend
-- **FastAPI**: Modern, fast web framework for building APIs
-- **LangGraph**: AI agent orchestration and state management
-- **Google Generative AI**: Large language model integration
-- **SerpAPI**: Google Flights data extraction
-- **AssemblyAI**: Real-time speech transcription
-- **Pydantic**: Data validation and serialization
-
-### Frontend
-- **Gradio**: Rapid UI development for ML applications
-- **Custom CSS**: Dark theme and responsive design
-- **JavaScript**: Interactive components and animations
-
-### Utilities
-- **Python-dotenv**: Environment variable management
-- **Logging**: Comprehensive logging system
-- **UV**: Fast Python package manager
-
-## 🎯 Usage Examples
-
-### Basic Flight Search
-```
-User: "I want to fly from Delhi to Mumbai on February 15th"
-Assistant: [Shows available flights with prices, airlines, and booking options]
-```
-
-### Round-trip Booking
-```
-User: "Find me flights from Delhi to Mumbai on Feb 15th, returning on Feb 20th"
-Assistant: [Shows outbound flights → return flights → booking options]
-```
-
-### Voice Input
-```
-User: [Clicks microphone] "Book a flight to New York next week"
-Assistant: [Processes voice input and shows relevant flights]
+travel-git-final-modular/
+├── backend/
+│   ├── agents/
+│   │   └── travel_agent.py      # LangGraph-based AI travel agent
+│   ├── routers/
+│   │   ├── flights.py            # Flight search API endpoints
+│   │   ├── airports.py           # Airport lookup endpoints
+│   │   └── geolocation.py        # Geolocation endpoints
+│   ├── tools/
+│   │   ├── flights.py            # Flight search tool for AI agent
+│   │   └── airports.py           # Airport lookup tool for AI agent
+│   ├── transcript/
+│   │   └── main.py               # AssemblyAI transcription service
+│   ├── utils.py                 # Backend utility functions
+│   └── main.py                   # FastAPI application entry point
+├── frontend/
+│   ├── components/
+│   │   └── ui_manager.py        # UI state management and updates
+│   ├── images/                  # UI assets (icons, etc.)
+│   ├── utils.py                 # Frontend utility functions
+│   └── main.py                   # Gradio application entry point
+├── shared_utils/
+│   ├── logger.py                # JSON-formatted logging utility
+│   └── load_data.py             # Shared data loading utilities
+├── flight_responses/            # Sample flight data and test responses
+├── pyproject.toml               # Project dependencies and metadata
+├── uv.lock                      # Dependency lock file
+└── README.md                    # This file
 ```
 
 ## 🔧 Configuration
 
 ### Environment Variables
+
 | Variable | Description | Required |
 |----------|-------------|----------|
-| `GOOGLE_API_KEY` | Google Generative AI API key | Yes |
-| `SERPAPI_API_KEY` | SerpAPI key for flight data | Yes |
-| `ASSEMBLYAI_API_KEY` | AssemblyAI key for voice features | Yes |
+| `google_api_key` | Google Gemini API key | Yes |
+| `SERPAPI_API_KEY` | SerpAPI key for flight searches | Yes |
+| `ASSEMBLYAI_API_KEY` | AssemblyAI key for voice transcription | Optional |
 
-### Customization
-- Modify `MAX_FLIGHTS` and `MAX_BOOKING_OPTIONS` in `frontend/main.py`
-- Update CSS variables in the `CSS` section for theme customization
-- Configure API endpoints in `frontend/components/ui_manager.py`
+### API Configuration
 
-## 🧪 Development
+The application uses the following default settings:
+- **Currency**: INR (Indian Rupees)
+- **Language**: English (en)
+- **Country**: India (in)
+- **Deep Search**: Enabled for comprehensive flight results
 
-### Project Structure
-```
-travel-git-final-modular/
-├── backend/                 # FastAPI backend
-│   ├── agents/             # AI agent logic
-│   ├── routers/            # API routes
-│   ├── tools/              # External integrations
-│   └── transcript/         # Speech processing
-├── frontend/               # Gradio frontend
-│   ├── components/         # UI components
-│   └── images/             # Static assets
-├── shared_utils/           # Shared utilities
-├── pyproject.toml          # Project configuration
-└── README.md              # This file
 ```
 
-### Adding New Features
-1. **Backend**: Add new routers in `backend/routers/`
-2. **Frontend**: Extend UI components in `frontend/components/`
-3. **AI Agent**: Modify agent logic in `backend/agents/`
+### Code Structure
 
-## 🐛 Troubleshooting
+- **Modular Design**: Each component (backend, frontend, shared_utils) is self-contained
+- **Type Safety**: Uses Pydantic models for data validation
+- **Async/Await**: Backend uses async/await for better performance
+- **State Management**: LangGraph for AI agent state, Gradio State for UI state
 
-### Common Issues
-1. **API Key Errors**: Ensure all environment variables are set correctly
-2. **Port Conflicts**: Change ports in `main.py` files if 8000/7860 are occupied
-3. **Dependency Issues**: Use `uv sync` or `pip install -r requirements.txt`
+### Logging
 
-### Debug Mode
-Enable debug logging by setting log level in `shared_utils/logger.py`
+The application uses JSON-formatted logging. Logs are output to stdout with the following structure:
+```json
+{
+  "timestamp": "2024-01-01 12:00:00.000",
+  "message": "Log message",
+  "module": "module_name",
+  "line": 123
+}
+```
 
-## 📄 License
+## 🙏 Acknowledgments
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+- Google Gemini for AI capabilities
+- SerpAPI for flight search integration
+- AssemblyAI for voice transcription
+- Gradio for the user interface framework
+- LangChain and LangGraph for AI agent framework
 
 ## 📞 Support
 
-For support and questions:
-- Create an issue in the repository
-- Check the troubleshooting section
-- Review the API documentation
+For issues, questions, or contributions, please open an issue on the repository.
 
 ---
 
-**Built with ❤️ using FastAPI, Gradio, and AI technologies**
+**Note**: Make sure to keep your API keys secure and never commit them to version control. Use environment variables or a `.env` file (which should be in `.gitignore`).
