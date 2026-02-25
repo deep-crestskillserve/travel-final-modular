@@ -107,13 +107,13 @@ travel-git-final-modular/
 
 1. **Start the FastAPI backend** (in one terminal):
    ```bash
-   python backend/main.py
+   python -m backend.main
    ```
    The API will be available at `http://localhost:8000`
 
 2. **Start the Gradio frontend** (in another terminal):
    ```bash
-   python frontend/main.py
+   python -m frontend.main
    ```
    The UI will be available at `http://localhost:7860` (or the URL shown in the terminal)
 
@@ -204,11 +204,14 @@ travel-git-final-modular/
 
 ### Environment Variables
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `google_api_key` | Google Gemini API key | Yes |
-| `SERPAPI_API_KEY` | SerpAPI key for flight searches | Yes |
-| `ASSEMBLYAI_API_KEY` | AssemblyAI key for voice transcription | Optional |
+| Variable | Description |
+|----------|-------------|
+| `google_api_key` | Google Gemini API key |
+| `SERPAPI_API_KEY` | SerpAPI key for flight searches |
+| `ASSEMBLYAI_API_KEY` | AssemblyAI key for voice transcription |
+| `GOOGLE_GEOLOCATION_API` | Google Geolocation API key for location-based services |
+| `AMADEUS_CLIENT_ID` | Amadeus API client ID for flight booking services |
+| `AMADEUS_CLIENT_SECRET` | Amadeus API client secret for flight booking services |
 
 ### API Configuration
 
